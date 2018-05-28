@@ -68,13 +68,13 @@ Instructor: Professor Chen Tian
 	Later we have Piriority-based Flow Control (PFC) to generate congestion information in ACKs.
 	Before this paper, we have Datacenter Quantized Congestion Notification (DCQCN) which uses the state-of-the-art scheme for congestion control.
 	However, we may find DCQCN incapable of some large-scale traffic scenarios.
-	In this paper, we will analyze the drawbacks of DCQCN.
-	At the same time, we will present our improvements to DCQCN.
+	In this paper, we analyze the drawbacks of DCQCN.
+	At the same time, we present our improvements to DCQCN and name it DCQCN+.
 	Improvements mainly focus on the adaptive increasing step and intervals.
 	We have implemented them on testbed testbeds and NS3 simulation.
 	Our method has the 10 times smaller latency than DCQCN under large-scale conditions (400+:1 incast) and 4 times larger flow capability than DCQCN.
 	While in small incast cases, we have similar performance with DCQCN.
-	This paper will mainly focus on my own work, about the testbed implementation and configurations of the method.
+	This paper additionally focuses on my own work, about the testbed implementation and configurations of the method.
 	It actually includes many detailed methods used for execution of experiments and detailed information about testbed experiment results.
 \end{abstract}
 
@@ -92,9 +92,9 @@ We hope to let the sender get some information about the receiver.
 
 Then we get Explicit Congestion Notification (ECN) at the beginning.
 This method uses a mark in the IP header from the ACK.
-If the receiver dropped a packet, it will echoes the congestion indication to the sender, so that the sender can reduce its sending rate.
-Such ECN flags will indicate the existance of congestion of receiver side after congestions have already happened.
-ECN will somehow relieve the congestion and make the receiver side drop fewer packets, but this still can't be lossless.
+If the receiver dropped a packet, it echoes the congestion indication to the sender, so that the sender can reduce its sending rate.
+Such ECN flags indicate the existance of congestion of receiver side after congestions have already happened.
+ECN somehow relieves the congestion and make the receiver side drop fewer packets, but this still can't be lossless.
 
 Later Quantized Congestion Notification (QCN) is developed.
 QCN enables the switch to control the packet sending rate of an Ethernet source whose packets are traversing the switch.
@@ -117,17 +117,17 @@ sender.
 Here the interval time mentioned is usually a interval time set up in advance by hardware to make sure that there won't be a CNP burst on
 RP side.
 This interval is also greatly limited by hardware ability.
-Detailed information will also be mentioned in later sections.
+Detailed information is also be mentioned in later sections.
 
-In the end I will briefly introduce the most important points about our new method DCQCN+.
+In the end I briefly introduce the most important points about our new method DCQCN+.
 DCQCN+ deploys dynamic rate control mechanisms to adapt incast of different scales instead of the fixed rate control for DCQCN.
 What I'm in charge of is the testbed configuration and experiments.
 
 The paper is organized as follows.
-In Section 2 we will introduce the background of the project.
+In Section 2 we introduce the background of the project.
 In Section 3 we present limitations of DCQCN and necessity for improvements.
 In Section 4 we show possible improvements for DCQCN.
-In Section 5 I will display detailed methods used for testbed experiments.
+In Section 5 I display detailed methods used for testbed experiments.
 In Section 6 we show the results of experiments.
 In Section 7 and 8, there are some discussions and future work.
 
@@ -198,6 +198,10 @@ which is shown in Figure ~\ref{fig:ECNMarking}.
 	\end{center}
 \end{figure}
 
+Such marking probability is a brandnew idea from QCN.
+Previously marking ECN or not is a fixed thing without possibility.
+Such 0/1 resolution for ECN is not proper because that may cause the late reaction from sender.
+
 \section{Problems of DCQCN}
 The major problem for DCQCN is the failure of dealing with large-scale incast traffic.
 Both in simulation and testbed experiments show that the switch buffer queue length remains high after a large burst at the beginning.
@@ -227,8 +231,88 @@ All the parameters used here are default parameters on Mellanox official forum, 
 	\end{center}
 \end{figure}
 
-\section{Possible Improvements}
+\section{Improvements for DCQCN}
 
+The key factor of DCQCN's failure is DCQCN's increase step, recovery speed and CNP supplies.
+These information used are out of date for the growing scalability for data centers.
+Those fixed increase steps, recovery speed and CNP intervals are not adaptive for large-scale traffic.
+What we do is to find factors which actually influence the congestion and can predict the congestion level better.
+
+Our work, DCQCN+ uses dynamic parameters to better analyze the congestion and therefore relieve it.
+DCQCN never cares about the incast scale and thus uses fixed parameters to do the job.
+That surely won't work for large-scale incast since the reaction and adjustments of sending rate are not very accurate.
+
+DCQCN+ designs to use the CNP period carried in CNPs and the flow rate to reflect the condition of the incast scale.
+There are some remaining available CNP fields to carry the period information of CNP.
+Also, since larger flows are more probable to be marked with ECN, its possibility to trigger a CNP is larger.
+Thus all congested flows can get similar rates and be balanced.
+
+To be more specific, improvements are discussed from three points (Congestion Point, Notification Point and Reaction Point).
+
+\subsection{Congestion Point}
+
+This part remains almost the same.
+What we can do at Congestion Point is really limited since CP is responsible for ECN marking.
+The probability for ECN marks are very resonable so we leave this part the same.
+
+We also need to mention here that PFC is still enabled to ensure lossless feature of datacenters.
+Although our method can make sure that convergence can be reached in most cases, we can't ensure lossless feature at the starting burst
+if PFC is disabled.
+
+\subsection{Notification Point}
+
+Receivers are in charge of generating CNPs.
+This is the most important part of the algorithm.
+
+At NP, two factors decide the CNP interval, the hardware ability of generating CNP and the demand for CNP at Reaction Point.
+We hope to supply enough CNPs with shorter intervals for RP to properly adjust the sending rate.
+At the same time we don't want to cause other problems like CNP burst or CNP congestion if we set the interval which is too short.
+Such problems may cause unnecessary bandwidth cost.
+The ability of hardware may incluence the minimal interval and demands for CNPs decide the maximal interval.
+We prefer the maximal interval to relieve the possibility of bandwidth cost.
+
+Once the flow rate collects enough information to decide the incast scale, the CNP interval should be decided.
+
+\subsection{Reaction Point}
+
+Here we first show the original DCQCN RP algorithm pseudocode in Figure ~\ref{fig:RPalg}.
+
+We make some changes on the updates of parameters.
+
+The reaction when receiving CNP is similar:
+\[R_T=R_C\]
+\[R_C=R_C(1-\alpha /2)\]
+\[\alpha = (1-g)\alpha + g\]
+
+Here $\alpha$ is a reduction factor, actually indicates the congestion level at the CP.
+$R_C$ denotes current rate and $R_T$ denotes target rate.
+$g$ is a parameter to estimate the congestion level.
+
+Instead of DCQCN's fixed rate increase timer $K=55\mu s$, we make it flexible:
+\[K=\lambda max(\tau, \frac{MTU}{R_C})\]
+where $MTU$ denotes Maximal Transmit Unit and $\tau$ denotes CNP interval.
+
+Here we remove the byte counter and add the rate increase counter.
+When the rate increase counter times out, the state S increses 1.
+
+The fast recovery scheme remains the same when $S$ is less than the threshold $F = 5$:
+\[R_C=\frac{R_C+R_T}{2}\]
+
+When $F<S<4F$,
+\[R_T=R_T+ min(\frac{1}{10}R_C,\frac{1}{100}R_l)\]
+\[R_C=\frac{R_C+R_T}{2}\]
+where $R_l$ is a ratio used to bound the increase step for small incast cases.
+
+When $F>4F$, Hyper Increase is applied,
+\[R_T=R_T+min(R_C, \frac{S-4F}{100}R_l)\]
+\[R_C=\frac{R_C+R_T}{2}\]
+
+Additionally, when $\alpha$ timer runs out,
+\[\alpha=(1-g)\alpha\]
+
+We can see a lot of changes to make the algorithm better.
+Such dynamic adjustments of parameters greatly improve the buffer estimation in advance and drain the congestion fast
+to maintain the buffer queue length low.
 
 \section{Implementation}
 
@@ -260,21 +344,21 @@ The whole expetiment environment should be separated from outside traffic includ
 VLAN is thus needed to create a separate topology.
 
 Switch need to enable the VLAN feature and include all machines in the same VLAN session.
-This will include some work on distinguishing ports.
+This includes some work on distinguishing ports.
 
 \subsubsection{PFC}
 PFC is needed because what we want is a lossless network which is a must for data center networks.
 PFC makes receiver to send PAUSE frame to sender where sending ratio is limited upon received PAUSE.
 Default PFC configuration contains 8 priority classes and we only have 2 used here.
-The mapping will be mentioned in the subsection ECN.
+The mapping is mentioned in the following subsection about ECN.
 
 \subsubsection{ECN}
 ECN priority is configured to make CNP working well. Higher priority is needed for higher traffic class.
 Inside our experiments, there are mostly two classes of traffic. RDMA traffic is in traffic class 3 and should be mapped to swith priority 3.
 Other traffic like TCP is in traffic class 0 and should be mapped to switch priority 0.
 The reason is that the traffic for setting up a flow shouldn't be blocked. If we don't set the priority difference, the flow setup traffic for a flow
-will be blocked when there are really a large number of flows. The flow setup period should use higher priority so that more flows can be created.
-About this point, we will mention it in later sections.
+is blocked when there are really a large number of flows. The flow setup period should use higher priority so that more flows can be created.
+About this point, we explain it in later sections.
 And the probability to make a ECN mark should be configured the same as mentioned in DCQCN--.
 
 \subsubsection{Buffer}
@@ -291,7 +375,7 @@ To make things clear, we need to cut unnecessary parts of traffic.
 We obviously don't contain loops inside our topology so that the spanning tree protocol is removed from the switch.
 
 The interface speed is set to 100Gbps when testing the hardware ability of generating CNP.
-For other most experiments, interface speed is configured as 10Gbps (reason will be explained in later sections).
+For other most experiments, interface speed is configured as 10Gbps (reason is explained in later sections).
 
 \subsection{NiC Configuration}
 At the very beginning, we need to install Mellanox OFED (driver for ConnectX-4) for every server.
@@ -329,7 +413,7 @@ Now the topology is the one shown in Figure ~\ref{topology}.
 We use the command ib\_send\_bw to start flows.
 
 
-First I will describe the key tools used here.
+First let me introduce the key tools used here.
 The mostly used library is Python Paramiko which provides secure connection for remote command execution and file transmission.
 It's actually a Python implementation of SSHv2 protocol, providing functions of both server and client.
 To be more specific, I contracted them down to four functions, one for connection checking, one for remote command execution and the other two for file
@@ -337,7 +421,7 @@ transmission between local and remote machines.
 Everything here is using SSH protocol and thus my functions can be implemented by Python Paramiko.
 
 Another point necessary to be mentioned here is multithreading. In the original version, the time for running is previously estimated.
-Thus the execution time of the program will greatly increased or a command is run before its previous steps are finished.
+Thus the execution time of the program is greatly increased or a command is run before its previous steps are finished.
 Function ''join'' can correctly sequence all the steps in the program.
 
 Bandwidth testing needs several steps:
@@ -396,7 +480,7 @@ Luckily string operations are easy for Python.
 I'm actually recording the same parts of the commands and add loops with transformed string from numbers.
 
 About the detailed information about the commands, we have several specific parameters set.
-The parameter ''-R'' is for RDMA connection setup. However we find that using RDMA traffic for a flow start will cause
+The parameter ''-R'' is for RDMA connection setup. However we find that using RDMA traffic for a flow start causes
 the traffic congested with other already-started flows. Thus we may fail to start a lot of flows at the same time.
 So in real experiments, we are not using the parameter.
 
@@ -418,12 +502,12 @@ The actual implementation of port allocation is like this:
 
 We are taking parameters of machine number and flow number of each machine at the beginning of the overall scripts.
 Assume that they are $m$ and $n$.
-All port number for flows starts from 10011. There will be a continuous range from 10011 to $10010+m\times n$ for port numbers.
-The first machine will take the position of port number like 10011, $10011+m$, ..., $10011+m\times(n-1)$.
+All port number for flows starts from 10011. There is a continuous range from 10011 to $10010+m\times n$ for port numbers.
+The first machine takes the position of port number like 10011, $10011+m$, ..., $10011+m\times(n-1)$.
 To be more general, the $i_{th}$ flow on the $j_{th}$ machine (where $i=1,2,...,n$ and $j=1,2,...,m$) has the port number of
 $10010+i+m\times(j-1)$.
-Thus all the port nuber will not collide with each other. This makes later steps easier to process.
-Those will be mentioned in later sections.
+Thus all the port numbers don't collide with each other. This makes later steps easier to process.
+Those are mentioned in later sections.
 
 \subsubsection{File Transmission}
 To be clear, we are running experiments on 9 machines.
@@ -456,7 +540,7 @@ $6^{th}$ term of the plain text) out of all possible flow receivers.
 For step 3, we can only devide all the flows on the same machine using the ports.
 Tcp and InfiniBand has its unique port forwarding methods which would surely dismiss the ports I set for them in the ''ib\_send'' commands.
 To separate all these flows, I write a C++ program to do the filtering work, collecting all the different port numbers and raise flags for new port numbers.
-Each new port number will start a new file for collection, containing the packets of a single flow.
+Each new port number starts a new file for collection, containing the packets of a single flow.
 The file names are carefully calculated.
 Suppose we have $m$ machines and each starts $n$ flows, then the numbering of the file names are similar to the one previously mentioned in port nubmering.
 The only difference is that port numbers start from 10010 and the file names start from 85 (which is the machine index in our testbed).

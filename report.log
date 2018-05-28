@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.11)  28 MAY 2018 13:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.11)  28 MAY 2018 17:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -230,43 +230,50 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [4]
 
 LaTeX Warning: Citation `MellanoxOfficial' on page 5 undefined on input line 22
-0.
+4.
 
 <DCQCNfail.png, id=25, 1319.93124pt x 376.40625pt>
 File: DCQCNfail.png Graphic file (type png)
  <use DCQCNfail.png>
-Package pdftex.def Info: DCQCNfail.png used on input line 224.
+Package pdftex.def Info: DCQCNfail.png used on input line 228.
 (pdftex.def)             Requested size: 433.62pt x 123.65732pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 224--225
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 228--229
  [] 
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[5 <./ECNMarking.png>] <topology.png, id=29, 958.58125pt x 755.82375pt>
+[5 <./ECNMarking.png>] [6 <./DCQCNfail.png>]
+
+LaTeX Warning: Reference `fig:RPalg' on page 7 undefined on input line 278.
+
+[7] <topology.png, id=36, 958.58125pt x 755.82375pt>
 File: topology.png Graphic file (type png)
-
-<use topology.png>
-Package pdftex.def Info: topology.png used on input line 245.
+ <use topology.png>
+Package pdftex.def Info: topology.png used on input line 329.
 (pdftex.def)             Requested size: 216.81pt x 170.94104pt.
- [6 <./DCQCNfail.png> <./topology.png>] [7] [8]
 
-LaTeX Warning: Reference `topology' on page 9 undefined on input line 328.
 
-[9] [10] [11] [12]
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[8] [9 <./topology.png>] [10]
+
+LaTeX Warning: Reference `topology' on page 11 undefined on input line 412.
+
+[11] [12] [13] [14]
 No file report.bbl.
-[13] (./report.aux)
+[15] (./report.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 2004 strings out of 493029
- 28899 string characters out of 6136234
+ 2005 strings out of 493029
+ 28910 string characters out of 6136234
  97416 words of memory out of 5000000
- 5531 multiletter control sequences out of 15000+600000
+ 5532 multiletter control sequences out of 15000+600000
  9717 words of font info for 34 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,6n,23p,239b,258s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -279,10 +286,10 @@ st/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/font
 s/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
 /amsfonts/cm/cmsy10.pfb>
-Output written on report.pdf (13 pages, 315186 bytes).
+Output written on report.pdf (15 pages, 323787 bytes).
 PDF statistics:
- 86 PDF objects out of 1000 (max. 8388607)
- 58 compressed objects within 1 object stream
+ 92 PDF objects out of 1000 (max. 8388607)
+ 62 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
