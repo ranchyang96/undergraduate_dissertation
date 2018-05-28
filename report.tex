@@ -24,10 +24,12 @@
 %\usepackage[version=3]{mhchem} % Package for chemical equation typesetting
 %\usepackage{siunitx} % Provides the \SI{}{} and \si{} command for typesetting SI units
 \usepackage{graphicx} % Required for the inclusion of images
-\usepackage{natbib} % Required to change bibliography style to APA
-\usepackage{amsmath} % Required for some math elements 
-\usepackage{enumerate}
-\setlength\parindent{24pt}
+\usepackage{geometry}
+%\usepackage{natbib} % Required to change bibliography style to APA
+%\usepackage{amsmath} % Required for some math elements 
+%\usepackage{enumerate}
+\usepackage{indentfirst}
+%\setlength\parindent{24pt}
 
 
 %\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
@@ -69,15 +71,16 @@ Instructor: Professor Chen Tian
 	In this paper, we will analyze the drawbacks of DCQCN.
 	At the same time, we will present our improvements to DCQCN.
 	Improvements mainly focus on the adaptive increasing step and intervals.
-	We have implemented them on real-machine testbeds and NS3 simulation.
+	We have implemented them on testbed testbeds and NS3 simulation.
 	Our method has the 10 times smaller latency than DCQCN under large-scale conditions (400+:1 incast) and 4 times larger flow capability than DCQCN.
 	While in small incast cases, we have similar performance with DCQCN.
-	This paper will mainly focus on my own work, about the real-machine implementation and configurations of the method.
-	It actually includes many detailed methods used for execution of experiments and detailed information about real-machine experiment results.
+	This paper will mainly focus on my own work, about the testbed implementation and configurations of the method.
+	It actually includes many detailed methods used for execution of experiments and detailed information about testbed experiment results.
 \end{abstract}
 
 
 \section{Introduction}
+
 Modern datacenters are experiencing a fierce increase in both scale and bandwidth.
 As we know, datacenters need small RTTs (some may be even tens of microseconds),
 ability to handle burst flows for incasts and support the equality and balancing for concurrent flows.
@@ -118,23 +121,23 @@ Detailed information will also be mentioned in later sections.
 
 In the end I will briefly introduce the most important points about our new method DCQCN+.
 DCQCN+ deploys dynamic rate control mechanisms to adapt incast of different scales instead of the fixed rate control for DCQCN.
-What I'm in charge of is the real-machine configuration and experiments.
+What I'm in charge of is the testbed configuration and experiments.
 
 The paper is organized as follows.
 In Section 2 we will introduce the background of the project.
 In Section 3 we present limitations of DCQCN and necessity for improvements.
 In Section 4 we show possible improvements for DCQCN.
-In Section 5 I will display detailed methods used for real-machine experiments.
+In Section 5 I will display detailed methods used for testbed experiments.
 In Section 6 we show the results of experiments.
 In Section 7 and 8, there are some discussions and future work.
 
 \section{Background}
 \subsection{Mellanox switch and ConnectX-4}
-In the real-machine experiments, we are using Mellanox SN2700 switch and ConnectX-4 Network Interface Cards.
+In the testbed experiments, we are using Mellanox SN2700 switch and ConnectX-4 Network Interface Cards.
 Mellanox SN2700 carries a huge throughput of 6.4Tb/s, 32 ports at 100GbE.
 The port speed can actually vary from 10Gb/s, 25Gb/s, 40Gb/s and 100Gb/s.
 All 32 ports are connected to 16 machines inside our testbed with 2 each, but only 9 ports on 9 separate machines are used inside our
-real-machine experiments.
+testbed experiments.
 
 ConnectX-4 EN adapter can support 100Gbps Ethernet Connectivity.
 Its Virtual Protocol Interconnect also supports EDR 100Gbps InfiniBand traffic.
@@ -196,7 +199,33 @@ which is shown in Figure ~\ref{fig:ECNMarking}.
 \end{figure}
 
 \section{Problems of DCQCN}
+The major problem for DCQCN is the failure of dealing with large-scale incast traffic.
+Both in simulation and testbed experiments show that the switch buffer queue length remains high after a large burst at the beginning.
 
+In testbed experiments, we actually find that when the flow number is under 400, the queue length will go down after 2 or 3 seconds.
+Here the flows are continuous InfiniBand traffic lasting for about 80 seconds and they are started at approximately the same time.
+There could be some turbulance of starting times but within 1 second.
+This means that when the flow number is not large, convergence should be reached within 2 seconds.
+
+However, when we start over 400 flows, the high queue length lasts till the end of all flows.
+Convergence fails to be reached when the flow number gets really large.
+
+Nowadays the tendency is that scale of datacenters go larger and larger which gives much pressure on datacenter networks.
+Such a long queue length surely lead to high network latency or unfairness.
+Thus the demand of datacenter network is not met.
+
+In simulation results, we find even worse convergence effect.
+Here from Figure ~\ref{fig:DCQCNfail}, we can see that 160 flows fail to be converged under 10Gbps links and 80 flows fail to 
+be converged under 40Gbps links.
+All the parameters used here are default parameters on Mellanox official forum, \cite{MellanoxOfficial}.
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=6in]{DCQCNfail}
+		\caption{DCQCN fails to converge}
+		\label{fig:DCQCNfail}
+	\end{center}
+\end{figure}
 
 \section{Possible Improvements}
 
