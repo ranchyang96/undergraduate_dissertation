@@ -708,7 +708,7 @@ We get the buffer usage difference in Figure ~\ref{fig:buffer} and latency diffe
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[width=6in]{latency}
-		\caption{Latency usage difference between DCQCN and DCQCN+}
+		\caption{Latency difference between DCQCN and DCQCN+}
 		\label{fig:latency}
 	\end{center}
 \end{figure}
@@ -727,6 +727,21 @@ Actually for most cases if the buffer usage maintains over 200KB, that's a failu
 Most large-scale incast is over the ability of DCQCN but can be controlled by DCQCN+.
 
 \section{Conclusion and Future Work}
+
+We have displayed the drawbacks of DCQCN.
+When the network encounters large-scale traffic like an incast, DCQCN is forced to trigger PFC for a long time.
+Such congestion control causes problems of high latency and buffer occupation.
+We also conducted experiments to observe its features.
+Then we develop DCQCN+, which does a better job in handling large-scale incasts and has similar performance with small incasts.
+With adaptive parameter adjustments, DCQCN+ actually dynamicly adjust congestion control scheme according to the incoming traffic.
+We can see that DCQCN+ really does much better in latency and buffer usage.
+
+Next steps of similar work should focus more than credit-based method of congestion control schemes.
+State-of-the-art methods do have better performance at the starting point.
+However as the scale of traffic and data storage grows larger, bandwidth never becomes a problem.
+People care more about latency and user experience.
+The general case is that, the growth of bandwidth and buffer size is much faster than that of processing ability.
+What we are pursuing in the future is to explore in different schemes hoping to find a mixture of method to relieve or even eliminate congestion.
 
 
 \bibliographystyle{apalike}

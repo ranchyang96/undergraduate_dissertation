@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.11)  29 MAY 2018 16:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.11)  29 MAY 2018 20:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -331,9 +331,9 @@ Overfull \hbox (15.36632pt too wide) in paragraph at lines 710--711
  [] 
  []
 
-[19 <./default.png> <./improved.png>]
+[19 <./default.png> <./improved.png>] [20 <./buffer.png>]
 No file report.bbl.
-[20 <./buffer.png>] [21 <./latency.png>] (./report.aux)
+[21 <./latency.png>] (./report.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -356,7 +356,7 @@ s/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
 /amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
 s/cm/cmsy10.pfb>
-Output written on report.pdf (21 pages, 681129 bytes).
+Output written on report.pdf (21 pages, 682203 bytes).
 PDF statistics:
  130 PDF objects out of 1000 (max. 8388607)
  79 compressed objects within 1 object stream
