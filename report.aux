@@ -1,9 +1,15 @@
 \relax 
+\citation{ECN}
+\citation{QCN}
+\citation{PFC}
+\citation{dcqcn}
+\citation{dctcp}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Background}{3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Mellanox switch and ConnectX-4}{3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Remote Direct Memory Access}{3}}
 \citation{dcqcn}
+\citation{NS3}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Priority-based Flow Control}{4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Explicit Congestion Notification}{4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.5}DCQCN}{4}}
@@ -17,46 +23,61 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Congestion Point}{6}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Notification Point}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Reaction Point}{7}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Implementation}{8}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Switch Configuration}{8}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Topology for multi-flow tests}}{9}}
-\newlabel{fig:topology}{{3}{9}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.1}VLAN}{9}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.2}PFC}{9}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.3}ECN}{9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces RP algorithm from DCQCN}}{7}}
+\newlabel{fig:RPalg}{{3}{7}}
+\citation{RoCEv2}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Implementation}{9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Topology for multi-flow tests}}{9}}
+\newlabel{fig:Topology}{{4}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Switch Configuration}{9}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.1}VLAN}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.2}PFC}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.3}ECN}{10}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.4}Buffer}{10}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.5}Additional Configurations}{10}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}NiC Configuration}{10}}
+\citation{Tcpdump}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.5}Additional Configurations}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}NiC Configuration}{11}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Experiment Process}{11}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Ability to Generate CNP}{11}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Bandwidth Testing}{11}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.1}State Refresh}{12}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.2}Time Synchronization}{12}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.3}Tcpdump Start}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Bandwidth Testing}{12}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.1}State Refresh}{13}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.2}Time Synchronization}{13}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.3}Tcpdump Start}{13}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.4}ib\_send\_bw Server Client Starter}{13}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.5}File Transmission}{14}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.6}Pcap Parsing}{14}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.7}Figure Plotting}{15}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Results}{15}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}NIC Ability to Generate CNPs}{15}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces CNP interval test}}{16}}
-\newlabel{fig:CNPint}{{4}{16}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.6}Pcap Parsing}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.7}Figure Plotting}{16}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Results}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}NIC Ability to Generate CNPs}{16}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces CNP interval test}}{17}}
+\newlabel{fig:CNPint}{{5}{17}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Bandwidth Condition for Small-Scale Incast}{17}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces 2:1 incast bandwidth}}{17}}
-\newlabel{fig:2on1_1}{{5}{17}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces 10:1 incast bandwidth}}{17}}
-\newlabel{fig:10on1_1}{{6}{17}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces 60:1 incast bandwidth}}{18}}
-\newlabel{fig:3_20_0}{{7}{18}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces 2:1 incast bandwidth}}{18}}
+\newlabel{fig:2on1_1}{{6}{18}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces 10:1 incast bandwidth}}{18}}
+\newlabel{fig:10on1_1}{{7}{18}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Latency and Buffer Usage of Large-Scale Incast}{18}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces DCQCN buffer usage and latency}}{19}}
-\newlabel{fig:default}{{8}{19}}
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Simulated DCQCN+ buffer usage and latency}}{19}}
-\newlabel{fig:improved}{{9}{19}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Buffer usage difference between DCQCN and DCQCN+}}{20}}
-\newlabel{fig:buffer}{{10}{20}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion and Future Work}{20}}
-\bibstyle{apalike}
-\bibdata{sample}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Latency difference between DCQCN and DCQCN+}}{21}}
-\newlabel{fig:latency}{{11}{21}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces 60:1 incast bandwidth}}{19}}
+\newlabel{fig:3_20_0}{{8}{19}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces DCQCN buffer usage and latency}}{19}}
+\newlabel{fig:default}{{9}{19}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Simulated DCQCN+ buffer usage and latency}}{20}}
+\newlabel{fig:improved}{{10}{20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Buffer usage difference between DCQCN and DCQCN+}}{20}}
+\newlabel{fig:buffer}{{11}{20}}
+\citation{credit}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Latency difference between DCQCN and DCQCN+}}{21}}
+\newlabel{fig:latency}{{12}{21}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion and Future Work}{21}}
+\bibstyle{IEEEtran}
+\bibdata{report}
+\bibcite{ECN}{1}
+\bibcite{QCN}{2}
+\bibcite{PFC}{3}
+\bibcite{dcqcn}{4}
+\bibcite{dctcp}{5}
+\bibcite{NS3}{6}
+\bibcite{MellanoxOfficial}{7}
+\bibcite{RoCEv2}{8}
+\bibcite{Tcpdump}{9}
+\bibcite{credit}{10}

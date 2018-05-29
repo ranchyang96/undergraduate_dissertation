@@ -29,6 +29,8 @@
 %\usepackage{amsmath} % Required for some math elements 
 %\usepackage{enumerate}
 \usepackage{indentfirst}
+%\usepackage{biblatex}
+%\addbibresource{report.bib}
 %\setlength\parindent{24pt}
 
 
@@ -90,26 +92,27 @@ That's not tolerable for sure in datacenters since datacenters require lossless 
 Then the first idea coming is to find a way to predict the congestion of the receiver end.
 We hope to let the sender get some information about the receiver.
 
-Then we get Explicit Congestion Notification (ECN) at the beginning.
+Then we get Explicit Congestion Notification (ECN) \cite{ECN} at the beginning.
 This method uses a mark in the IP header from the ACK.
 If the receiver dropped a packet, it echoes the congestion indication to the sender, so that the sender can reduce its sending rate.
 Such ECN flags indicate the existance of congestion of receiver side after congestions have already happened.
 ECN somehow relieves the congestion and make the receiver side drop fewer packets, but this still can't be lossless.
 
-Later Quantized Congestion Notification (QCN) is developed.
+Later Quantized Congestion Notification (QCN) \cite{QCN} is developed.
 QCN enables the switch to control the packet sending rate of an Ethernet source whose packets are traversing the switch.
 This maintains a stable queue occupancy and is easy to be implemented on hardwares.
 QCN is also applicable for multiple flows in a same port.
 
-Priority-based Flow Control (PFC) applies the PAUSE frame to make things better.
+Priority-based Flow Control (PFC) \cite{PFC} applies the PAUSE frame to make things better.
 PAUSE is used by the receiver to send feedback on the sender about the buffer space.
 PFC actually divide services into 8 classes to make the feedback information more accurate.
 Since the PAUSE frame carries more information, sender can know the exact remaining space in receiver buffer.
 Thus the reaction on sending rate can be more accurate.
 However this method can't be specific on flows but only on ports, which is usually combined with ECN to make it work better.
 
-Before this paper, we have Datacenter QCN (DCQCN) which handles congestion better and is the essence of our work.
+Before this paper, we have Datacenter QCN (DCQCN) \cite{dcqcn} which handles congestion better and is the essence of our work.
 DCQCN is the application of QCN on datacenters, which divides the overall algorithms into three parts.
+It's kind of combination of Datacenter TCP (DCTCP) \cite{dctcp} and PFC.
 A brandnew concept mentioned here is Congestion Notification Packet (CNP), which functions similarly as PAUSE frame in PFC but carries more informations.
 CNP packets are actually sent by NP which is the receiver end.
 Each time when a packet with ECN mark is got and there are no CNP packets sent during the last interval time, a CNP is sent to notify the
@@ -204,7 +207,7 @@ Such 0/1 resolution for ECN is not proper because that may cause the late reacti
 
 \section{Problems of DCQCN}
 The major problem for DCQCN is the failure of dealing with large-scale incast traffic.
-Both in simulation and testbed experiments show that the switch buffer queue length remains high after a large burst at the beginning.
+Both in simulation \cite{NS3} and testbed experiments show that the switch buffer queue length remains high after a large burst at the beginning.
 
 In testbed experiments, we actually find that when the flow number is under 400, the queue length will go down after 2 or 3 seconds.
 Here the flows are continuous InfiniBand traffic lasting for about 80 seconds and they are started at approximately the same time.
@@ -276,6 +279,13 @@ Once the flow rate collects enough information to decide the incast scale, the C
 \subsection{Reaction Point}
 
 Here we first show the original DCQCN RP algorithm pseudocode in Figure ~\ref{fig:RPalg}.
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=4in]{RPalg}
+		\caption{RP algorithm from DCQCN}
+		\label{fig:RPalg}
+	\end{center}
+\end{figure}
 
 We make some changes on the updates of parameters.
 
@@ -320,15 +330,15 @@ We set up the testbed of testing for DCQCN+ on Mellanox SN2700 switch and 9 Ubun
 Mellanox SN2700 provides the most predictable, highest density 100GbE switching platform for the growing demands of today's data centers,
 which satisfies our experiment environment for over 400 flows at a time.
 ConnectX-4 dual-port adapter cards with Virtual Protocol Interconnect (VPI) support 100Gb/s InfiniBand and 100Gb/s Ethernet connectivity.
-All the features including RoCEv2, PFC and ECN are supported on Mellanox SN2700 and ConnectX-4 adapter card.
+All the features including RoCEv2 \cite{RoCEv2}, PFC and ECN are supported on Mellanox SN2700 and ConnectX-4 adapter card.
 
-To generate enough number of flows for our experiment, the topology is shown in Figure ~\ref{fig:topology}.
+To generate enough number of flows for our experiment, the topology is shown in Figure ~\ref{fig:Topology}.
 
 \begin{figure}[ht]
 	\begin{center}
-		\includegraphics[width=3in]{topology}
+		\includegraphics[width=3in]{Topology}
 		\caption{Topology for multi-flow tests}
-		\label{fig:topology}
+		\label{fig:Topology}
 	\end{center}
 \end{figure}
 
@@ -386,7 +396,7 @@ After that, we have several steps (most corresponds with the upper switch config
 	\item Enable ECN for both InfiniBand traffic and TCP traffic.
 	\item Set CNP priority and DSCP priority.
 	\item Set priority for RDMA traffic.
-	\item Open sniffer for Tcpdump to capture InfiniBand packets.
+	\item Open sniffer for Tcpdump \cite{Tcpdump} to capture InfiniBand packets.
 \end{enumerate}
 
 \subsection{Experiment Process}
@@ -409,7 +419,7 @@ According to the timestamps, we can know something about the ability of ConnectX
 
 \subsection{Bandwidth Testing}
 
-Now the topology is the one shown in Figure ~\ref{topology}.
+Now the topology is the one shown in Figure ~\ref{fig:Topology}.
 We use the command ib\_send\_bw to start flows.
 
 
@@ -600,7 +610,7 @@ Both are capable of our DCQCN+ algorithm.
 \subsection{Bandwidth Condition for Small-Scale Incast}
 At the beginning, we are not sure about our switch's ability, so we conducted some small-scale incast to test the switch and our configurations.
 This can be called a duplicate of the original DCQCN.
-The topologies are similar to Figure ~\ref{fig:topology} but the number of receiver hosts vary.
+The topologies are similar to Figure ~\ref{fig:Topology} but the number of receiver hosts vary.
 All the interface speeds are set to 10Gbps.
 
 Here are the examples of several experiments.
@@ -736,7 +746,7 @@ Then we develop DCQCN+, which does a better job in handling large-scale incasts 
 With adaptive parameter adjustments, DCQCN+ actually dynamicly adjust congestion control scheme according to the incoming traffic.
 We can see that DCQCN+ really does much better in latency and buffer usage.
 
-Next steps of similar work should focus more than credit-based method of congestion control schemes.
+Next steps of similar work should focus more on credit-based method of congestion control schemes like \cite{credit}.
 State-of-the-art methods do have better performance at the starting point.
 However as the scale of traffic and data storage grows larger, bandwidth never becomes a problem.
 People care more about latency and user experience.
@@ -744,9 +754,10 @@ The general case is that, the growth of bandwidth and buffer size is much faster
 What we are pursuing in the future is to explore in different schemes hoping to find a mixture of method to relieve or even eliminate congestion.
 
 
-\bibliographystyle{apalike}
 
-\bibliography{sample}
+\bibliographystyle{IEEEtran}
+\bibliography{report}
+%\printbibliography
 
 %----------------------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.11)  29 MAY 2018 20:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.11)  29 MAY 2018 21:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -87,18 +87,18 @@ Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
 ) (./report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -192,174 +192,179 @@ e
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 51.
+(Font)              <14.4> on input line 53.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 51.
+(Font)              <7> on input line 53.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 54.
+(Font)              <12> on input line 56.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 54.
+(Font)              <8> on input line 56.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 54.
+(Font)              <6> on input line 56.
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
-Overfull \hbox (5.90025pt too wide) in paragraph at lines 136--141
+Overfull \hbox (5.90025pt too wide) in paragraph at lines 139--144
 []\OT1/cmr/m/n/12 In the testbed ex-per-i-ments, we are us-ing Mel-lanox SN2700
  switch and ConnectX-
  []
 
 [3]
-Overfull \hbox (1.96141pt too wide) in paragraph at lines 166--170
+Overfull \hbox (1.96141pt too wide) in paragraph at lines 169--173
 []\OT1/cmr/m/n/12 Explicit Con-ges-tion No-ti-fi-ca-tion is de-signed to in-di-
 cate con-ges-tion to the sender.
  []
 
-
-LaTeX Warning: Citation `dcqcn' on page 4 undefined on input line 172.
-
 <ECNMarking.png, id=18, 650.43pt x 424.58624pt>
 File: ECNMarking.png Graphic file (type png)
  <use ECNMarking.png>
-Package pdftex.def Info: ECNMarking.png used on input line 195.
+Package pdftex.def Info: ECNMarking.png used on input line 198.
 (pdftex.def)             Requested size: 216.81pt x 141.52623pt.
  [4]
-
-LaTeX Warning: Citation `MellanoxOfficial' on page 5 undefined on input line 22
-4.
-
 <DCQCNfail.png, id=25, 1319.93124pt x 376.40625pt>
 File: DCQCNfail.png Graphic file (type png)
  <use DCQCNfail.png>
-Package pdftex.def Info: DCQCNfail.png used on input line 228.
+Package pdftex.def Info: DCQCNfail.png used on input line 231.
 (pdftex.def)             Requested size: 433.62pt x 123.65732pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 228--229
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 231--232
  [] 
  []
 
 [5 <./ECNMarking.png>] [6 <./DCQCNfail.png>]
-
-LaTeX Warning: Reference `fig:RPalg' on page 7 undefined on input line 278.
-
-[7] <topology.png, id=36, 958.58125pt x 755.82375pt>
-File: topology.png Graphic file (type png)
- <use topology.png>
-Package pdftex.def Info: topology.png used on input line 329.
+<RPalg.png, id=32, 666.4128pt x 497.0267pt>
+File: RPalg.png Graphic file (type png)
+ <use RPalg.png>
+Package pdftex.def Info: RPalg.png used on input line 284.
+(pdftex.def)             Requested size: 289.07999pt x 215.59814pt.
+ [7 <./RPalg.png>]
+[8] <Topology.png, id=42, 958.58125pt x 755.82375pt>
+File: Topology.png Graphic file (type png)
+ <use Topology.png>
+Package pdftex.def Info: Topology.png used on input line 339.
 (pdftex.def)             Requested size: 216.81pt x 170.94104pt.
 
-[8] [9 <./topology.png>] [10]
-
-LaTeX Warning: Reference `topology' on page 11 undefined on input line 412.
-
-[11] [12] [13] [14] [15] <CNPint.png, id=62, 144.54pt x 609.27625pt>
+[9 <./Topology.png>] [10] [11] [12] [13] [14] [15]
+<CNPint.png, id=65, 144.54pt x 609.27625pt>
 File: CNPint.png Graphic file (type png)
-
-<use CNPint.png>
-Package pdftex.def Info: CNPint.png used on input line 586.
+ <use CNPint.png>
+Package pdftex.def Info: CNPint.png used on input line 596.
 (pdftex.def)             Requested size: 72.26999pt x 304.63737pt.
- [16 <./CNPint.png>]
-<2on1_1.png, id=68, 2409.0pt x 677.53125pt>
+ [16]
+<2on1_1.png, id=69, 2409.0pt x 677.53125pt>
 File: 2on1_1.png Graphic file (type png)
  <use 2on1_1.png>
-Package pdftex.def Info: 2on1_1.png used on input line 612.
+Package pdftex.def Info: 2on1_1.png used on input line 622.
 (pdftex.def)             Requested size: 433.62pt x 121.95036pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 612--613
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 622--623
  [] 
  []
 
-<10on1_1.png, id=69, 2409.0pt x 677.53125pt>
+<10on1_1.png, id=70, 2409.0pt x 677.53125pt>
 File: 10on1_1.png Graphic file (type png)
  <use 10on1_1.png>
-Package pdftex.def Info: 10on1_1.png used on input line 626.
+Package pdftex.def Info: 10on1_1.png used on input line 636.
 (pdftex.def)             Requested size: 433.62pt x 121.95036pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 626--627
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 636--637
  [] 
  []
 
-[17 <./2on1_1.png> <./10on1_1.png>]
-<3_20_0.png, id=75, 2409.0pt x 677.53125pt>
+[17 <./CNPint.png>] <3_20_0.png, id=75, 2409.0pt x 677.53125pt>
 File: 3_20_0.png Graphic file (type png)
- <use 3_20_0.png>
-Package pdftex.def Info: 3_20_0.png used on input line 641.
+
+<use 3_20_0.png>
+Package pdftex.def Info: 3_20_0.png used on input line 651.
 (pdftex.def)             Requested size: 433.62pt x 121.95036pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 641--642
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 651--652
  [] 
  []
 
-<default.png, id=76, 1761.58125pt x 190.7125pt>
+[18 <./2on1_1.png> <./10on1_1.png>]
+<default.png, id=81, 1761.58125pt x 190.7125pt>
 File: default.png Graphic file (type png)
  <use default.png>
-Package pdftex.def Info: default.png used on input line 665.
+Package pdftex.def Info: default.png used on input line 675.
 (pdftex.def)             Requested size: 433.62pt x 46.94467pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 665--666
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 675--676
  [] 
  []
 
-[18 <./3_20_0.png>] <improved.png, id=81, 1760.5775pt x 189.70876pt>
+<improved.png, id=82, 1760.5775pt x 189.70876pt>
 File: improved.png Graphic file (type png)
-
-<use improved.png>
-Package pdftex.def Info: improved.png used on input line 687.
+ <use improved.png>
+Package pdftex.def Info: improved.png used on input line 697.
 (pdftex.def)             Requested size: 433.62pt x 46.72365pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 687--688
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 697--698
  [] 
  []
 
-<buffer.png, id=82, 1204.5pt x 677.53125pt>
+[19 <./3_20_0.png> <./default.png>]
+<buffer.png, id=89, 1204.5pt x 677.53125pt>
 File: buffer.png Graphic file (type png)
  <use buffer.png>
-Package pdftex.def Info: buffer.png used on input line 702.
+Package pdftex.def Info: buffer.png used on input line 712.
 (pdftex.def)             Requested size: 433.62pt x 243.91106pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 702--703
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 712--713
  [] 
  []
 
-<latency.png, id=83, 1204.5pt x 677.53125pt>
+<latency.png, id=90, 1204.5pt x 677.53125pt>
 File: latency.png Graphic file (type png)
  <use latency.png>
-Package pdftex.def Info: latency.png used on input line 710.
+Package pdftex.def Info: latency.png used on input line 720.
 (pdftex.def)             Requested size: 433.62pt x 243.91106pt.
 
-Overfull \hbox (15.36632pt too wide) in paragraph at lines 710--711
+Overfull \hbox (15.36632pt too wide) in paragraph at lines 720--721
  [] 
  []
 
-[19 <./default.png> <./improved.png>] [20 <./buffer.png>]
-No file report.bbl.
-[21 <./latency.png>] (./report.aux)
+[20 <./improved.png> <./buffer.png>] [21 <./latency.png>] (./report.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 29--31
+[]\OT1/cmr/m/it/12 802.1Qaz - Quan-tized Con-ges-tion No-ti-fi-cac-tion\OT1/cmr
+/m/n/12 ,
+ []
 
-LaTeX Warning: There were undefined references.
 
- ) 
+Overfull \hbox (53.15776pt too wide) in paragraph at lines 33--35
+[]\OT1/cmr/m/it/12 802.1Qbb - Priority-based Flow Con-trol\OT1/cmr/m/n/12 , htt
+p://www.ieee802.org/1/pages/802.1bb.html,
+ []
+
+
+Underfull \hbox (badness 8075) in paragraph at lines 54--57
+[]\OT1/cmr/m/n/12 ``Mellanox dc-qcn pa-ram-e-ters.'' [On-line]. Avail-able:
+ []
+
+) [22] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 2053 strings out of 493029
- 29588 string characters out of 6136234
- 97490 words of memory out of 5000000
- 5572 multiletter control sequences out of 15000+600000
- 9717 words of font info for 34 fonts, out of 8000000 for 9000
+ 2077 strings out of 493029
+ 29872 string characters out of 6136234
+ 97530 words of memory out of 5000000
+ 5592 multiletter control sequences out of 15000+600000
+ 10064 words of font info for 35 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,6n,23p,239b,258s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/font
-s/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy10.pfb>
-Output written on report.pdf (21 pages, 682203 bytes).
+ 38i,6n,23p,239b,264s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc1
+0.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/s
+hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmti12.pfb>
+Output written on report.pdf (22 pages, 803451 bytes).
 PDF statistics:
- 130 PDF objects out of 1000 (max. 8388607)
- 79 compressed objects within 1 object stream
+ 139 PDF objects out of 1000 (max. 8388607)
+ 84 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 56 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 61 words of extra memory for PDF output out of 10000 (max. 10000000)
 
