@@ -73,8 +73,8 @@ Instructor: Professor Chen Tian
 	In this paper, we analyze the drawbacks of DCQCN.
 	At the same time, we present our improvements to DCQCN and name it DCQCN+.
 	Improvements mainly focus on the adaptive increasing step and intervals.
-	We have implemented them on testbed testbeds and NS3 simulation.
-	Our method has the 10 times smaller latency than DCQCN under large-scale conditions (400+:1 incast) and 4 times larger flow capability than DCQCN.
+	We have implemented them on testbeds and NS3 simulation.
+	Our method has 10 times smaller latency than DCQCN under large-scale conditions (incast of over 400:1) and 4 times larger flow capability than DCQCN.
 	While in small incast cases, we have similar performance with DCQCN.
 	This paper additionally focuses on my own work, about the testbed implementation and configurations of the method.
 	It actually includes many detailed methods used for execution of experiments and detailed information about testbed experiment results.
@@ -84,8 +84,15 @@ Instructor: Professor Chen Tian
 \section{Introduction}
 
 Modern datacenters are experiencing a fierce increase in both scale and bandwidth.
+To be more specific, we find following features of datacenters nowadays:
+\begin{enumerate}
+	\item Small latency: $<100\mu s$
+	\item High bandwidth: $10/40~100Gbps$
+	\item Shallow buffer: $<300MB$ for ToR
+	\item Large scale: $>10000$ machines
+\end{enumerate}
 As we know, datacenters need small RTTs (some may be even tens of microseconds),
-ability to handle burst flows for incasts and support the equality and balancing for concurrent flows.
+so abilities to handle burst flows for incasts and support the equality and balancing for concurrent flows matter a lot.
 Traditional TCP/IP stack surely can't do the job.
 When encountering a large number of concurrent flows, TCP may choose to drop packets when the receiver buffer is full.
 That's not tolerable for sure in datacenters since datacenters require lossless network to ensure the security and accuracy in large-scale traffic.
@@ -93,10 +100,10 @@ Then the first idea coming is to find a way to predict the congestion of the rec
 We hope to let the sender get some information about the receiver.
 
 Then we get Explicit Congestion Notification (ECN) \cite{ECN} at the beginning.
-This method uses a mark in the IP header from the ACK.
+This method uses a mark in the IP header of the ACK.
 If the receiver dropped a packet, it echoes the congestion indication to the sender, so that the sender can reduce its sending rate.
-Such ECN flags indicate the existance of congestion of receiver side after congestions have already happened.
-ECN somehow relieves the congestion and make the receiver side drop fewer packets, but this still can't be lossless.
+Such ECN flags indicate the existance of congestion from receiver side after congestions have already happened.
+ECN somehow relieves the congestion and makes the receiver side drop fewer packets, but this still can't be lossless.
 
 Later Quantized Congestion Notification (QCN) \cite{QCN} is developed.
 QCN enables the switch to control the packet sending rate of an Ethernet source whose packets are traversing the switch.
@@ -104,26 +111,26 @@ This maintains a stable queue occupancy and is easy to be implemented on hardwar
 QCN is also applicable for multiple flows in a same port.
 
 Priority-based Flow Control (PFC) \cite{PFC} applies the PAUSE frame to make things better.
-PAUSE is used by the receiver to send feedback on the sender about the buffer space.
+PAUSE is used by the receiver to send feedback to the sender about the remaining buffer space.
 PFC actually divide services into 8 classes to make the feedback information more accurate.
 Since the PAUSE frame carries more information, sender can know the exact remaining space in receiver buffer.
 Thus the reaction on sending rate can be more accurate.
 However this method can't be specific on flows but only on ports, which is usually combined with ECN to make it work better.
 
-Before this paper, we have Datacenter QCN (DCQCN) \cite{dcqcn} which handles congestion better and is the essence of our work.
+Before this paper, we have Datacenter QCN (DCQCN) \cite{dcqcn} which handles congestion better and is the basic point of our work.
 DCQCN is the application of QCN on datacenters, which divides the overall algorithms into three parts.
 It's kind of combination of Datacenter TCP (DCTCP) \cite{dctcp} and PFC.
 A brandnew concept mentioned here is Congestion Notification Packet (CNP), which functions similarly as PAUSE frame in PFC but carries more informations.
 CNP packets are actually sent by NP which is the receiver end.
-Each time when a packet with ECN mark is got and there are no CNP packets sent during the last interval time, a CNP is sent to notify the
+Each time when a packet with ECN mark is got and there are no CNP packets sent during the last interval period, a CNP is sent to notify the
 sender.
-Here the interval time mentioned is usually a interval time set up in advance by hardware to make sure that there won't be a CNP burst on
+Here the interval period mentioned is usually a interval set up in advance by hardware to make sure that there won't be a CNP burst on
 RP side.
 This interval is also greatly limited by hardware ability.
 Detailed information is also be mentioned in later sections.
 
 In the end I briefly introduce the most important points about our new method DCQCN+.
-DCQCN+ deploys dynamic rate control mechanisms to adapt incast of different scales instead of the fixed rate control for DCQCN.
+DCQCN+ deploys dynamic rate control mechanisms to adapt to incast of different scales instead of the fixed rate control for DCQCN.
 What I'm in charge of is the testbed configuration and experiments.
 
 The paper is organized as follows.
@@ -147,14 +154,14 @@ Its Virtual Protocol Interconnect also supports EDR 100Gbps InfiniBand traffic.
 We have ConnectX-4 adapters on all machines in our testbed.
 Additionally we have tested the ability of ConnectX-5 adapters on a new testbed about the Congestion Notification Packet generation
 ability.
-This will described later.
+This is described in later sections.
 
 \subsection{Remote Direct Memory Access}
-Remote Direct Memory Access almost satisfy all the demands for datacenter networks.
+Remote Direct Memory Access almost satisfies all the demands for datacenter networks.
 It permits high throughput and low latency.
 Similar to Direct Memory Access, RDMA actually allows user-space applications to directly read or write without the operation from
 any operating systems.
-Such network feature omits the possible copies inside systems thus performs better inside datacenters.
+Such network feature omits the possible copies inside systems, thus performs better inside datacenters.
 
 \subsection{Priority-based Flow Control}
 Priority-based Flow Control ensures the lossless feature for RDMA.
@@ -169,7 +176,7 @@ Such unfairness and high latency are fatal to datacenters and we hope to make up
 Explicit Congestion Notification is designed to indicate congestion to the sender.
 An ECN-aware router may set a mark in the IP header instead of dropping a packet in order to signal impending congestion.
 The receiver of the packet echoes the congestion indication to the sender,
-which reduces its transmission rate as if it detected a dropped packet.
+which reduces its transmission rate if it detects a dropped packet.
 
 \subsection{DCQCN}
 Datacenter Quantized Congestion Notification is explained in detail by \cite{dcqcn}.
@@ -211,20 +218,20 @@ Both in simulation \cite{NS3} and testbed experiments show that the switch buffe
 
 In testbed experiments, we actually find that when the flow number is under 400, the queue length will go down after 2 or 3 seconds.
 Here the flows are continuous InfiniBand traffic lasting for about 80 seconds and they are started at approximately the same time.
-There could be some turbulance of starting times but within 1 second.
+There could be some difference in starting times but within 1 second.
 This means that when the flow number is not large, convergence should be reached within 2 seconds.
 
 However, when we start over 400 flows, the high queue length lasts till the end of all flows.
 Convergence fails to be reached when the flow number gets really large.
 
-Nowadays the tendency is that scale of datacenters go larger and larger which gives much pressure on datacenter networks.
-Such a long queue length surely lead to high network latency or unfairness.
+Nowadays the tendency is that scale of datacenters grow larger and larger which gives much pressure on datacenter networks.
+Such a long queue length surely lead to high network latency and unfairness.
 Thus the demand of datacenter network is not met.
 
 In simulation results, we find even worse convergence effect.
 Here from Figure ~\ref{fig:DCQCNfail}, we can see that 160 flows fail to be converged under 10Gbps links and 80 flows fail to 
 be converged under 40Gbps links.
-All the parameters used here are default parameters on Mellanox official forum, \cite{MellanoxOfficial}.
+All the parameters used here are default parameters on Mellanox official forum \cite{MellanoxOfficial}.
 
 \begin{figure}[ht]
 	\begin{center}
@@ -245,8 +252,8 @@ Our work, DCQCN+ uses dynamic parameters to better analyze the congestion and th
 DCQCN never cares about the incast scale and thus uses fixed parameters to do the job.
 That surely won't work for large-scale incast since the reaction and adjustments of sending rate are not very accurate.
 
-DCQCN+ designs to use the CNP period carried in CNPs and the flow rate to reflect the condition of the incast scale.
-There are some remaining available CNP fields to carry the period information of CNP.
+DCQCN+ is designed to use the CNP period carried in CNPs and the flow rate to reflect the condition of the incast scale.
+There are some remaining available fields to carry the period information of CNP.
 Also, since larger flows are more probable to be marked with ECN, its possibility to trigger a CNP is larger.
 Thus all congested flows can get similar rates and be balanced.
 
@@ -271,10 +278,10 @@ At NP, two factors decide the CNP interval, the hardware ability of generating C
 We hope to supply enough CNPs with shorter intervals for RP to properly adjust the sending rate.
 At the same time we don't want to cause other problems like CNP burst or CNP congestion if we set the interval which is too short.
 Such problems may cause unnecessary bandwidth cost.
-The ability of hardware may incluence the minimal interval and demands for CNPs decide the maximal interval.
+The ability of hardware may influence the minimal interval and demands for CNPs decide the maximal interval.
 We prefer the maximal interval to relieve the possibility of bandwidth cost.
 
-Once the flow rate collects enough information to decide the incast scale, the CNP interval should be decided.
+Once the flow rate collects enough information to decide the incast scale, the timer period should be decided.
 
 \subsection{Reaction Point}
 
@@ -333,6 +340,7 @@ ConnectX-4 dual-port adapter cards with Virtual Protocol Interconnect (VPI) supp
 All the features including RoCEv2 \cite{RoCEv2}, PFC and ECN are supported on Mellanox SN2700 and ConnectX-4 adapter card.
 
 To generate enough number of flows for our experiment, the topology is shown in Figure ~\ref{fig:Topology}.
+Each machine can create several flows simultaniously.
 
 \begin{figure}[ht]
 	\begin{center}
@@ -363,18 +371,18 @@ Default PFC configuration contains 8 priority classes and we only have 2 used he
 The mapping is mentioned in the following subsection about ECN.
 
 \subsubsection{ECN}
-ECN priority is configured to make CNP working well. Higher priority is needed for higher traffic class.
+ECN priority is configured to make CNP function well. Higher priority is needed for higher traffic class.
 Inside our experiments, there are mostly two classes of traffic. RDMA traffic is in traffic class 3 and should be mapped to swith priority 3.
 Other traffic like TCP is in traffic class 0 and should be mapped to switch priority 0.
 The reason is that the traffic for setting up a flow shouldn't be blocked. If we don't set the priority difference, the flow setup traffic for a flow
 is blocked when there are really a large number of flows. The flow setup period should use higher priority so that more flows can be created.
 About this point, we explain it in later sections.
-And the probability to make a ECN mark should be configured the same as mentioned in DCQCN--.
+And the probability to make a ECN mark should be configured the same as mentioned in DCQCN \cite{dcqcn}.
 
 \subsubsection{Buffer}
 About the buffer size, we don't need to be very specific. The maximal buffer size inside Mellanox 2700N switch is 5.1MB.
-One important factor to be consider is the buffer usage during the experiment process.
-When a lot of flows are created, there must be a burst of buffer at the beginning.
+One important factor to be considered is the buffer usage during the experiment process.
+When a lot of flows are created, there must be a burst of packets in the receiver buffer at the beginning.
 After a short period of reaction time, the buffer usage should go down because the senders are limited by switch based on flows.
 In the results, what we are hoping to see is that the beginning of the buffer is large but after the short reaction time, the buffer is low.
 Thus the buffer here is only to handle the burst at the beginning.
@@ -387,7 +395,7 @@ We obviously don't contain loops inside our topology so that the spanning tree p
 The interface speed is set to 100Gbps when testing the hardware ability of generating CNP.
 For other most experiments, interface speed is configured as 10Gbps (reason is explained in later sections).
 
-\subsection{NiC Configuration}
+\subsection{NIC Configuration}
 At the very beginning, we need to install Mellanox OFED (driver for ConnectX-4) for every server.
 
 After that, we have several steps (most corresponds with the upper switch configurations):
@@ -408,11 +416,11 @@ However before all of that, the first experiment is to test the CNP generation s
 
 \subsection{Ability to Generate CNP}
 
-All NiC has limited ability. For ConnectX-4 and ConnectX-5, we hope to figure out the exact ability of doing this so that we can adjust the DCQCN efficiently.
+All NIC has limited ability. For ConnectX-4 and ConnectX-5, we hope to figure out the exact ability of doing this so that we can adjust the DCQCN efficiently.
 
 The topology is simple. Two servers are connected to the switch, one as sender and one as receiver.
 For the receiver side, the interface speed is set to 10Gbps. The sender side has an interface speed of 100Gbps.
-Thus the congestion surely exist and we use Tcpdump to capture the packets during a short period of time.
+Thus the congestion surely exists and we use Tcpdump to capture the packets during a short period of time.
 
 Among the packets captured inside the Pcap file, we filter the traffic with right direction and right IP addresses out.
 According to the timestamps, we can know something about the ability of ConnectX-4 and ConnectX-5.
@@ -438,9 +446,9 @@ Bandwidth testing needs several steps:
 \begin{enumerate}
 	\item Refresh machine states.
 	\item Time synchronization for all servers.
-	\item Start Tcpdump simultaneously on S1~S8.
+	\item Start Tcpdump simultaneously on S1 to S8.
 	\item Start ib\_send\_bw server on S0.
-	\item Start ib\_send\_bw clients on S1~S8.
+	\item Start ib\_send\_bw clients on S1 to S8.
 	\item Send Pcap files to local.
 	\item Parse Pcap files.
 	\item Use parsed results to draw bandwidth figure.
@@ -458,7 +466,7 @@ some processes continuing during the stages. We need to refresh the states for m
 To kill the processes running from the last experiment, we use the command ''pkill -f'' to kill processes with the label of ''ib\_send''.
 
 \subsubsection{Time Synchronization}
-We use Network Time Protocol (NTP) to synchronize the time for S0~S8.
+We use Network Time Protocol (NTP) to synchronize the time for S0 to S8.
 The accuracy for NTP is about 0.01ms so that should work for servers on a rack.
 Choosing a server inside the same rack, we set up an NTP server on it.
 
@@ -487,26 +495,26 @@ This contains the concatenation of mark ''\&'' and other strings.
 ''\&'' is used for simultaneous command execution. Linux System usually has the ability to run over 1000 processes simultaneously.
 
 Luckily string operations are easy for Python.
-I'm actually recording the same parts of the commands and add loops with transformed string from numbers.
+I'm actually recording the same parts of the commands and adding loops with transformed string from numbers.
 
-About the detailed information about the commands, we have several specific parameters set.
-The parameter ''-R'' is for RDMA connection setup. However we find that using RDMA traffic for a flow start causes
+About the detailed information about the commands, we have several specific options set.
+The option ''-R'' is for RDMA connection setup. However we find that using RDMA traffic for a flow start causes
 the traffic congested with other already-started flows. Thus we may fail to start a lot of flows at the same time.
-So in real experiments, we are not using the parameter.
+So in real experiments, we are not using the option.
 
-The parameter ''-S 3'' means the priority class for RDMA traffic. This can also be set for ROCEv2 protocol.
+The option ''-S 3'' means the priority class for RDMA traffic. This can also be set for ROCEv2 protocol.
 We add it here just to be sure that the traffic class priority is working.
 
-The parameter ''-x'' denotes the device ID we are using, which can be fetched through the command ''show\_gids''.
+The option ''-x'' denotes the device ID we are using, which can be fetched through the command ''show\_gids''.
 This displays the ROCE version we are using and the corresponding device ID and destination IP.
 ''show\_gids'' is only needed once for each machine so that it's not actaully included as part of the automation tool.
 
-The parameter ''-d'' denotes the network devices used for the execution which is mlx5\_1 for our machines.
+The option ''-d'' denotes the network devices used for the execution which is mlx5\_1 for our machines.
 
-The parameter ''-D'' shows the lasting time of our experiment. It counts in seconds of the continuous sending procedure.
+The option ''-D'' shows the lasting time of our experiment. It counts in seconds of the continuous sending procedure.
 In our experiment it's usually 60 or 80 which shows almost a complete tendency of the bandwidth and flows.
 
-The parameter ''-p'' is responsible for separating flows. In our experiment, we hope to create multiple flows from one machine.
+The option ''-p'' is responsible for separating flows. In our experiment, we hope to create multiple flows from one machine.
 The number could be tens and even reach 90 so we need to use port number to start different flows.
 The actual implementation of port allocation is like this: 
 
@@ -524,9 +532,11 @@ To be clear, we are running experiments on 9 machines.
 Besides that, we have a middle machine with accounts to login, making the machines more secure.
 And we have a local machine to process the results we get. We are using a local machine to do this because
 we hope to keep the experiment machines clean and fewer new tools should be used there.
+I use Python Paramiko for remote login and file transmission.
+A tough point is that all file location should be absolute locations but that's OK since the amount needed is not very large.
 
 Thus the file transmission has two parts. First step would be sending Pcap files from experiment machines to the middle machine.
-The second would transmitt the files from the middle machine to the local machine.
+The second would be transmitting the files from the middle machine to the local machine.
 
 \subsubsection{Pcap Parsing}
 This contains several steps. We can't make sure that this is the easiest way to process these packets but it works fine.
@@ -539,8 +549,8 @@ This contains several steps. We can't make sure that this is the easiest way to 
 	\item Add counts of zeros for those milliseconds which contains no packets.
 \end{enumerate}
 
-For step 1, I use the command of Tcpdump with the parameter of ''-r'' which means reading.
-With option ''-rrrr'' and ''-nnq'' we transfer the Pcap file into plain text with 8 terms.
+For step 1, I use the command of Tcpdump with the option of ''-r'' which means reading.
+With options ''-rrrr'' and ''-nnq'' we transfer the Pcap file into plain text with 8 terms.
 Among them we have the timestamp, source IP, source port, destination IP and destination port.
 Thus we can approximately calculate the bandwidth from such informations.
 
@@ -548,7 +558,7 @@ For step 2, I use Awk to do the filtering. By limiting the receiver as the only 
 $6^{th}$ term of the plain text) out of all possible flow receivers.
 
 For step 3, we can only devide all the flows on the same machine using the ports.
-Tcp and InfiniBand has its unique port forwarding methods which would surely dismiss the ports I set for them in the ''ib\_send'' commands.
+TCP and InfiniBand has its unique port forwarding methods which would surely dismiss the ports I set for them in the ''ib\_send'' commands.
 To separate all these flows, I write a C++ program to do the filtering work, collecting all the different port numbers and raise flags for new port numbers.
 Each new port number starts a new file for collection, containing the packets of a single flow.
 The file names are carefully calculated.
@@ -575,6 +585,18 @@ Before we have figured out the timeline and packet count for each millisecond.
 For most packets, they have the same size of 1KB which is fixed by the command ''ib\_send''.
 Thus we can indicate the bandwidth through packet count of each millisecond.
 
+\subsection{Latency and Buffer Usage}
+
+Most steps are similar to the last subsection about bandwidth testing.
+We are doing this part because as the flow number increases bandwidth collecting is super time-consuming.
+
+Latency and buffer usage can reveal the effect of convergence more effectively.
+For latency, I'm using ''ib\_send\_lat'' on each machine which provides average latency and extreme latency during a time period.
+What I collect is simply the average latency which is shown in Figure ~\ref{fig:default} and Figure ~\ref{fig:improved}.
+
+About buffer usages, I collect manually from interfaces provided in Mellanox switches.
+I collect buffer information every 10 seconds to get them collected in Figure ~\ref{fig:default} and Figure ~\ref{fig:improved}.
+
 \section{Results}
 
 \subsection{NIC Ability to Generate CNPs}
@@ -582,7 +604,7 @@ We test the ability of generating CNPs for both ConnectX-4 and ConnectX-5 NICs.
 
 The experiment topology is really simple.
 Two hosts are connected to the Mellanox SN2700 switch, with the interface speed configured to 10Gbps and 100Gbps respectively.
-The 100Gbps one then send continuous InfiniBand traffic to the 10Gbps one.
+The 100Gbps one then sends continuous InfiniBand traffic to the 10Gbps one.
 When the switch is correctly configured with PFC and ECN enabled, we can find a burst of CNPs in a short period of time.
 
 CNP can be distinguished by filtering the OP code of InfiniBand header which is 129.
@@ -682,7 +704,7 @@ Those columns marked from 86 to 95 are average latency for flows on each machine
 86 to 95 are machine numbers.
 I also use scripts to collect number of flows that are successfully started to make sure that all flow start properly.
 
-Then we apply some changes from DCQCN+. To be more specific, they are listes as follows:
+Then we apply some parameter changes to DCQCN+. To be more specific, they are listes as follows:
 \begin{enumerate}
 	\item DcQcnRateReduceMonitorPeriod, which the time period between rate reductions, is changed from $4\mu s$ to $40\mu s$.
 	\item DcQcnTimeReset, which is the time period between rate increase events, is changed from $300\mu s$ to $3.1*flownum \mu s$.
@@ -750,9 +772,16 @@ Next steps of similar work should focus more on credit-based method of congestio
 State-of-the-art methods do have better performance at the starting point.
 However as the scale of traffic and data storage grows larger, bandwidth never becomes a problem.
 People care more about latency and user experience.
-The general case is that, the growth of bandwidth and buffer size is much faster than that of processing ability.
+The general case is that, the growth of bandwidth is much faster than that of processing ability and buffer size.
 What we are pursuing in the future is to explore in different schemes hoping to find a mixture of method to relieve or even eliminate congestion.
 
+\section*{Aknowledgement}
+
+I greatly thank my advisor Prof. Chen Tian for his instructions and help all these years.
+I also thank Dr. Yixiao Gao for instructing me on experiments and his great efforts on NS3 simulations.
+Additionally I need to thank Bo Li and other members in NASA group for their help in switch configurations and experiment executions.
+I also appreciate Huawei Co. Ltd and Mellanox for their help during the process of the project.
+Thanks for the support from my family, friends and other people who give me instructions and suggestions.
 
 
 \bibliographystyle{IEEEtran}
