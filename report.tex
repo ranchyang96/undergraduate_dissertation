@@ -129,7 +129,7 @@ In Section 3 we present limitations of DCQCN and necessity for improvements.
 In Section 4 we show possible improvements for DCQCN.
 In Section 5 I display detailed methods used for testbed experiments.
 In Section 6 we show the results of experiments.
-In Section 7 and 8, there are some discussions and future work.
+In Section 7 there are some discussions and future work.
 
 \section{Background}
 \subsection{Mellanox switch and ConnectX-4}
@@ -190,7 +190,7 @@ for $S>K_{max}$, $P = 1$
 
 which is shown in Figure ~\ref{fig:ECNMarking}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\begin{center}
 		\includegraphics[width=3in]{ECNMarking}
 		\caption{ECN Marking Probability for CP in DCQCN}
@@ -223,7 +223,7 @@ Here from Figure ~\ref{fig:DCQCNfail}, we can see that 160 flows fail to be conv
 be converged under 40Gbps links.
 All the parameters used here are default parameters on Mellanox official forum, \cite{MellanoxOfficial}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\begin{center}
 		\includegraphics[width=6in]{DCQCNfail}
 		\caption{DCQCN fails to converge}
@@ -324,7 +324,7 @@ All the features including RoCEv2, PFC and ECN are supported on Mellanox SN2700 
 
 To generate enough number of flows for our experiment, the topology is shown in Figure ~\ref{fig:topology}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\begin{center}
 		\includegraphics[width=3in]{topology}
 		\caption{Topology for multi-flow tests}
@@ -567,7 +567,164 @@ Thus we can indicate the bandwidth through packet count of each millisecond.
 
 \section{Results}
 
-\section{Discussion}
+\subsection{NIC Ability to Generate CNPs}
+We test the ability of generating CNPs for both ConnectX-4 and ConnectX-5 NICs.
+
+The experiment topology is really simple.
+Two hosts are connected to the Mellanox SN2700 switch, with the interface speed configured to 10Gbps and 100Gbps respectively.
+The 100Gbps one then send continuous InfiniBand traffic to the 10Gbps one.
+When the switch is correctly configured with PFC and ECN enabled, we can find a burst of CNPs in a short period of time.
+
+CNP can be distinguished by filtering the OP code of InfiniBand header which is 129.
+Then I find a period of continuous CNPs and can get the approximate interval between CNPs.
+With the parameter of CNP interval (min\_time\_between\_cnps) is set to 0, the results collected are just what we want.
+
+Figure ~\ref{fig:CNPint} shows the interval of continuous CNPs under ConnectX-4 adapters.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=1in]{CNPint}
+		\caption{CNP interval test}
+		\label{fig:CNPint}
+	\end{center}
+\end{figure}
+
+The first column marks the packet number (those ommitted are not CNPs) and the second column includes timestamps in seconds.
+
+Tcpdump with RDMA packet sniffer on can capture enough packets to generate the results.
+ConnectX-4 NIC can generate 1 packet per microsecond.
+ConnectX-5 NIC can generate 3 packets per microsecond.
+We can find some small improvements in hardware ability between the NICs of the two generation.
+Both are capable of our DCQCN+ algorithm.
+
+\subsection{Bandwidth Condition for Small-Scale Incast}
+At the beginning, we are not sure about our switch's ability, so we conducted some small-scale incast to test the switch and our configurations.
+This can be called a duplicate of the original DCQCN.
+The topologies are similar to Figure ~\ref{fig:topology} but the number of receiver hosts vary.
+All the interface speeds are set to 10Gbps.
+
+Here are the examples of several experiments.
+
+In Figure ~\ref{fig:2on1_1}, it's a 2:1 incast with flows from 2 machines.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{2on1_1}
+		\caption{2:1 incast bandwidth}
+		\label{fig:2on1_1}
+	\end{center}
+\end{figure}
+
+We can see, at the beginning of the flows, there's a line-rate start and the speed swiftly climbs to over 10Gbps.
+After that, CNPs start working and both flows begin to limit sending rate and later within 0.5s, their speeds converge about
+600 packets per millisecond, which is about 5Gbps.
+
+In Figure ~\ref{fig:10on1_1}, it's a 10:1 incast with 10 flows coming from 10 hosts.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{10on1_1}
+		\caption{10:1 incast bandwidth}
+		\label{fig:10on1_1}
+	\end{center}
+\end{figure}
+
+As we can see, the beginning parts are similar with 2:1 incast, but several flows fails to converge.
+This is actually because of the Tcpdump covering range.
+I set a limit for number of packets captured by Tcpdump for each flow and that stops the figure of showing later bandwidth.
+
+Later we try to draw bandwidth figures for more flows on the same machine.
+We use 3 machines with each sending 20 flows at the same time and we get this in Figure ~\ref{fig:3_20_0}.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{3_20_0}
+		\caption{60:1 incast bandwidth}
+		\label{fig:3_20_0}
+	\end{center}
+\end{figure}
+
+Although I have extended the capturing range a lot, the information can be grabbed from this figure is not much.
+However, it's still obvious that the 60 flows converge within 0.5 second.
+We should admit that the original DCQCN works for small-scale incast.
+
+\subsection{Latency and Buffer Usage of Large-Scale Incast}
+As the flow number grows larger, we find it hard to depict the bandwidth tendency using pictures.
+There are mainly 2 reasons: too many lines override each other and we can't observe the tendency clearly, 
+long capturing time makes the processing and figuring time extremely long (some may even last hours).
+
+So we transfer to use latency and queue length to take a look at the large-scale incasts.
+We are sending traffic for 80 seconds and pick 7 samples for each running starting from 10 seconds after flows start.
+We execute 9 experiments, with each creating 80, 160, 240, ..., 720 flows.
+That is, with 8 senders, each of the senders creates 10, 20, 30, ..., 90 flows.
+
+With default paremeters coming from DCQCN, we get Figure ~\ref{fig:default}.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{default}
+		\caption{DCQCN buffer usage and latency}
+		\label{fig:default}
+	\end{center}
+\end{figure}
+
+Those columns marked from 86 to 95 are average latency for flows on each machine.
+86 to 95 are machine numbers.
+I also use scripts to collect number of flows that are successfully started to make sure that all flow start properly.
+
+Then we apply some changes from DCQCN+. To be more specific, they are listes as follows:
+\begin{enumerate}
+	\item DcQcnRateReduceMonitorPeriod, which the time period between rate reductions, is changed from $4\mu s$ to $40\mu s$.
+	\item DcQcnTimeReset, which is the time period between rate increase events, is changed from $300\mu s$ to $3.1*flownum \mu s$.
+	\item DcQcnAiRate, which is the rate increase step in Active Increase phase, is changed from $5Mbps$ to $\frac{256}{flownum} Mbps$.
+\end{enumerate}
+These are the only three parameters modifiable for our new algorithm and should contain more modifications if really applied to chips.
+
+Thus we get Figure ~\ref{fig:improved}.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{improved}
+		\caption{Simulated DCQCN+ buffer usage and latency}
+		\label{fig:improved}
+	\end{center}
+\end{figure}
+
+We can see obvious difference between Figure ~\ref{fig:improved} and Figure ~\ref{fig:default}.
+It's apparent that modified parameters provides shorter latency time and less buffer usage.
+That marks the success of convergence and also demands reached for datacenter networks.
+
+To take a closer look at the difference between the original DCQCN and DCQCN+.
+We get the buffer usage difference in Figure ~\ref{fig:buffer} and latency difference in Figure ~\ref{fig:latency}.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{buffer}
+		\caption{Buffer usage difference between DCQCN and DCQCN+}
+		\label{fig:buffer}
+	\end{center}
+\end{figure}
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{latency}
+		\caption{Latency usage difference between DCQCN and DCQCN+}
+		\label{fig:latency}
+	\end{center}
+\end{figure}
+
+To be clear, the buffer we collected is the maximal buffer usage 5 seconds after flows are started.
+And in Figure ~\ref{fig:latency} the latency is depicted in exponential scaling to make the difference clearer.
+
+We see that at the small scales, DCQCN+ seems to be worse than DCQCN.
+That's actually the reason caused by parameter scaling.
+The parameter scaling provided by Mellanox interface can't handle such accurate work, so I just pick the nearest integer,
+which possibly cause the small disadvantage.
+
+From Figure ~\ref{fig:buffer} we can know that the maximal buffer allocated is 5.1MB and when the flow number reaches 720,
+the convergence completely fails.
+Actually for most cases if the buffer usage maintains over 200KB, that's a failure of convergence.
+Most large-scale incast is over the ability of DCQCN but can be controlled by DCQCN+.
 
 \section{Conclusion and Future Work}
 
