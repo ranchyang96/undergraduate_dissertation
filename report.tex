@@ -88,6 +88,7 @@ Instructor: Professor Chen Tian
 	It actually includes many detailed methods used for execution of experiments and detailed information about testbed experiment results.
 \end{abstract}
 
+\tableofcontents
 
 \section{Introduction}
 
@@ -125,9 +126,13 @@ Since the PAUSE frame carries more information, sender can know the exact remain
 Thus the reaction on sending rate can be more accurate.
 However this method can't be specific on flows but only on ports, which is usually combined with ECN to make it work better.
 
+Datacenter TCP (DCTCP) \cite{dctcp} begins to react in proportion to the extent of congestion instead of presence.
+This congestion level is conveyed by ECN marks carried by packets.
+These ECN marks are based on instantaneous queue length.
+
 Before this paper, we have Datacenter QCN (DCQCN) \cite{dcqcn} which handles congestion better and is the basic point of our work.
 DCQCN is the application of QCN on datacenters, which divides the overall algorithms into three parts.
-It's kind of combination of Datacenter TCP (DCTCP) \cite{dctcp} and PFC.
+It's kind of combination of Datacenter TCP (DCTCP) and PFC.
 A brandnew concept mentioned here is Congestion Notification Packet (CNP), which functions similarly as PAUSE frame in PFC but carries more informations.
 CNP packets are actually sent by NP which is the receiver end.
 Each time when a packet with ECN mark is got and there are no CNP packets sent during the last interval period, a CNP is sent to notify the
@@ -137,7 +142,7 @@ RP side.
 This interval is also greatly limited by hardware ability.
 Detailed information is also be mentioned in later sections.
 
-In the end I briefly introduce the most important points about our new method DCQCN+.
+In the end here is a brief introduction of the most important points about our new method DCQCN+.
 DCQCN+ deploys dynamic rate control mechanisms to adapt to incast of different scales instead of the fixed rate control for DCQCN.
 What I'm in charge of is the testbed configuration and experiments.
 
@@ -185,6 +190,16 @@ Explicit Congestion Notification is designed to indicate congestion to the sende
 An ECN-aware router may set a mark in the IP header instead of dropping a packet in order to signal impending congestion.
 The receiver of the packet echoes the congestion indication to the sender,
 which reduces its transmission rate if it detects a dropped packet.
+
+\subsection{Datacenter TCP}
+
+DCTCP has 2 brandnew features. It somehow reveals the basic points of DCQCN.
+
+The first is reacting in proportion to the extent of congestion but not its presence.
+It's actually reducing window size based on fraction of marked packets.
+
+The second is that ECN marks are based on instantaneous queue length.
+It provides fast feedback to better deal with bursts and also simplifies the hardware implementation.
 
 \subsection{DCQCN}
 Datacenter Quantized Congestion Notification is explained in detail by \cite{dcqcn}.
@@ -766,6 +781,34 @@ the convergence completely fails.
 Actually for most cases if the buffer usage maintains over 200KB, that's a failure of convergence.
 Most large-scale incast is over the ability of DCQCN but can be controlled by DCQCN+.
 
+\subsection{Results from NS3 Simulations}
+
+Simulations are conducted by Dr. Yixiao Gao. The topology used are the same with Figure ~\ref{fig:Topology}.
+
+With 8 senders starting a same number of flows at a uniform time within 0.1 second,
+we can thus collect information easier than testbeds.
+Four experiments are conducted with the flow number of 800, 1200, 1600 and 2000 respectively,
+which means each of the senders start 100, 150, 200, 250 flows respectively.
+
+We get results with the link speed of 10Gbps and 40Gbps.
+They are shown in Figure ~\ref{fig:simulation}.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[width=6in]{simulation}
+		\caption{Flow rate convergence encountering large incasts in DCQCN+}
+		\label{fig:latency}
+	\end{center}
+\end{figure}
+
+We can see that the results are much better than the testbed results.
+That makes sense since simulation does better in details.
+Simulation can actually implement the timer updates mentioned in DCQCN+ but testbed can only use static parameters and some parameters
+aren't accurate.
+
+Compared with original DCQCN, DCQCN+ has 20 times smaller queue length, which is 20 times smaller queueing latency.
+
+
 \section{Conclusion and Future Work}
 
 We have displayed the drawbacks of DCQCN.
@@ -783,7 +826,7 @@ People care more about latency and user experience.
 The general case is that, the growth of bandwidth is much faster than that of processing ability and buffer size.
 What we are pursuing in the future is to explore in different schemes hoping to find a mixture of method to relieve or even eliminate congestion.
 
-\section*{Aknowledgement}
+\section*{Acknowledgement}
 
 I greatly thank my advisor Prof. Chen Tian for his instructions and help all these years.
 I also thank Dr. Yixiao Gao for instructing me on experiments and his great efforts on NS3 simulations.
