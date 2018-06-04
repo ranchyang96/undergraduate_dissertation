@@ -49,6 +49,17 @@ Y.~Zhu, H.~Eran, D.~Firestone, C.~Guo, M.~Lipshteyn, Y.~Liron, J.~Padhye,
 ``The ns3 simulator.'' [Online]. Available: \url{https://www.nsnam.org/}
 \BIBentrySTDinterwordspacing
 
+\bibitem{Tcpdump}
+\BIBentryALTinterwordspacing
+``Tcpdump.'' [Online]. Available: \url{http://www.tcpdump.org/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{DCQCNsim}
+\BIBentryALTinterwordspacing
+``Dcqcn ns-3 simulator.'' [Online]. Available:
+  \url{https://github.com/bobzhuyb/ns3-rdma}
+\BIBentrySTDinterwordspacing
+
 \bibitem{MellanoxOfficial}
 \BIBentryALTinterwordspacing
 ``Mellanox dcqcn parameters.'' [Online]. Available:
@@ -58,11 +69,6 @@ Y.~Zhu, H.~Eran, D.~Firestone, C.~Guo, M.~Lipshteyn, Y.~Liron, J.~Padhye,
 \bibitem{RoCEv2}
 \emph{RoCEv2}, \url{https://cw.infiniband.org/document/dl/7781}, Infiniband
   Trade Association, 2014.
-
-\bibitem{Tcpdump}
-\BIBentryALTinterwordspacing
-``Tcpdump.'' [Online]. Available: \url{http://www.tcpdump.org/}
-\BIBentrySTDinterwordspacing
 
 \bibitem{credit}
 D.~Han, D.~Han, and D.~Han, ``Credit-scheduled delay-bounded congestion control

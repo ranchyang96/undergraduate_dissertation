@@ -236,8 +236,17 @@ Previously marking ECN or not is a fixed thing without possibility.
 Such 0/1 resolution for ECN is not proper because that may cause the late reaction from sender.
 
 \section{Problems of DCQCN}
+
 The major problem for DCQCN is the failure of dealing with large-scale incast traffic.
-Both in simulation \cite{NS3} and testbed experiments show that the switch buffer queue length remains high after a large burst at the beginning.
+Both in simulation \cite{NS3} and testbed experiments show that the switch buffer queue length remains high
+after a large burst at the beginning.
+
+\subsection{Testbed experiments}
+
+We use the topology from Figure ~\ref{fig:Topology}.
+Actually there are 9 hosts and one of them is the receiver, the rest of them are senders.
+For large-scale congestion, we use Tcpdump \cite{Tcpdump} to capture packets for throughput statistics.
+We also turn on sniffer on NICs to make sure that traps are triggered in Lipcap.
 
 In testbed experiments, we actually find that when the flow number is under 400, the queue length will go down after 2 or 3 seconds.
 Here the flows are continuous InfiniBand traffic lasting for about 80 seconds and they are started at approximately the same time.
@@ -251,6 +260,10 @@ Nowadays the tendency is that scale of datacenters grow larger and larger which 
 Such a long queue length surely lead to high network latency and unfairness.
 Thus the demand of datacenter network is not met.
 
+\subsection{NS3 Simulation}
+
+Here we use the DCQCN simulation \cite{DCQCNsim} released by Yibo Zhu, the designer of DCQCN.
+
 In simulation results, we find even worse convergence effect.
 Here from Figure ~\ref{fig:DCQCNfail}, we can see that 160 flows fail to be converged under 10Gbps links and 80 flows fail to 
 be converged under 40Gbps links.
@@ -263,6 +276,19 @@ All the parameters used here are default parameters on Mellanox official forum \
 		\label{fig:DCQCNfail}
 	\end{center}
 \end{figure}
+
+\subsection{Difference between DCQCN and ConnectX-4 implementation}
+
+When tested in testbeds, we find something really strange.
+
+When we set all the links to 10Gbps in a topology shown in Figure ~\ref{fig:Topology},
+we can see that at the beginning the sending rate increases at line rate.
+However when we change the link speed to 40Gbps or 100Gbps with the same topology,
+we see the speed increasing tendancy similar to the 10Gbps one, which is not at line rate.
+
+There must be some implementation difference between the ConnectX-4 and the original DCQCN.
+I guess the possible reason for that is, at the creation time of DCQCN, 10Gbps is a suitable upper bound of line rate start.
+10Gbps is also a maximal flow rate under DCQCN's control, thus the speed gaining scheme can be suitable for a long time.
 
 \section{Improvements for DCQCN}
 
@@ -343,7 +369,7 @@ When $F<S<4F$,
 \[R_C=\frac{R_C+R_T}{2}\]
 where $R_l$ is a ratio used to bound the increase step for small incast cases.
 
-When $F>4F$, Hyper Increase is applied,
+When $S>4F$, Hyper Increase is applied,
 \[R_T=R_T+min(R_C, \frac{S-4F}{100}R_l)\]
 \[R_C=\frac{R_C+R_T}{2}\]
 
@@ -797,7 +823,7 @@ They are shown in Figure ~\ref{fig:simulation}.
 	\begin{center}
 		\includegraphics[width=6in]{simulation}
 		\caption{Flow rate convergence encountering large incasts in DCQCN+}
-		\label{fig:latency}
+		\label{fig:simulation}
 	\end{center}
 \end{figure}
 
