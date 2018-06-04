@@ -692,20 +692,13 @@ To be more clear about the coloring condition, we can take a look at Figure ~\re
 
 Most steps are similar to the last subsection about bandwidth testing.
 We are doing this part because as the flow number increases bandwidth collecting is super time-consuming.
-Sometimes this part may last hours and the figure we get is unclear and lines overlap each other.
 
 Latency and buffer usage can reveal the effect of convergence more effectively.
 For latency, I'm using ''ib\_send\_lat'' on each machine which provides average latency and extreme latency during a time period.
 What I collect is simply the average latency which is shown in Figure ~\ref{fig:default} and Figure ~\ref{fig:improved}.
 
-With filtered returning messages, I can gain information from the screen output.
-The output should include 8 lines with each describing the result from 1 machine.
-I collect the results and find some rules inside.
-
 About buffer usages, I collect manually from interfaces provided in Mellanox switches.
 I collect buffer information every 10 seconds to get them collected in Figure ~\ref{fig:default} and Figure ~\ref{fig:improved}.
-All the flows last for 80 seconds and I start collecting from the $10_{th}$ second and manually read the buffer every 10 seconds.
-Altogether I collect buffer usage information at 7 time points which is sufficient for us to analyze the condition.
 
 \section{Results}
 
