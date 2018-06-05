@@ -169,6 +169,15 @@ Additionally we have tested the ability of ConnectX-5 adapters on a new testbed 
 ability.
 This is described in later sections.
 
+\subsection{InfiniBand}
+
+InfiniBand is a computer-networking communication standard used in high-performance computing.
+Such standard supports features of high throughput and low latency.
+
+It can actually work both among and within computers. It's most commonly used in supercomputers and data centers.
+
+In later testbed experiments, commands ''ib\_send'' includes IB which is the abbreviation of InfiniBand.
+
 \subsection{Remote Direct Memory Access}
 Remote Direct Memory Access almost satisfies all the demands for datacenter networks.
 It permits high throughput and low latency.
@@ -439,7 +448,8 @@ Each machine can create several and even tens of flows simultaniously.
 	\end{center}
 \end{figure}
 
-To be clear, we regard the server on the left (which is the receiver) as S0 and the servers on the right (which are senders) as S1 to S8.
+To be clear in Figure ~\ref{fig:Topology},
+we regard the server on the left (which is the receiver) as S0 and the servers on the right (which are senders) as S1 to S8.
 All the servers are configured into the same virtual local area network (VLAN) so that we can construct an incast traffic inside the network.
 
 \subsection{Switch Configuration}
@@ -455,6 +465,19 @@ VLAN is thus needed to create a separate topology.
 
 Switch need to enable the VLAN feature and include all machines in the same VLAN session.
 This includes some work on distinguishing ports.
+
+\subsubsection{Port mirroring}
+
+We try to collect the InfiniBand traffic from
+receiver end thus we don't need to process the received information from all different isenders.
+However such method doesn't work because we can't sniffer the InfiniBand traffic from the receiver side.
+
+Mirroring is also configured as sessions in switches.
+In our experiment, we configure the session's input as the receiver and the output as another vacant machine in the same rack.
+After flows are started, we start Tcpdump on the mirror session's output machine to capture packets.
+
+Such a method can deal with small-scale incast but not large-scale ones.
+Even a enlarged buffer size for Tcpdump can't handle the amount of traffic in large-scale incasts.
 
 \subsubsection{PFC}
 PFC is needed because what we want is a lossless network which is a must for data center networks.
