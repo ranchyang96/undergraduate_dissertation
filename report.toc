@@ -6,7 +6,7 @@
 \contentsline {subsection}{\numberline {2.4}RoCE v2}{5}
 \contentsline {subsection}{\numberline {2.5}Priority-based Flow Control}{6}
 \contentsline {subsection}{\numberline {2.6}Explicit Congestion Notification}{6}
-\contentsline {subsection}{\numberline {2.7}Datacenter TCP}{6}
+\contentsline {subsection}{\numberline {2.7}Data Center TCP}{6}
 \contentsline {subsection}{\numberline {2.8}DCQCN}{6}
 \contentsline {subsection}{\numberline {2.9}Python Paramiko Library}{7}
 \contentsline {subsection}{\numberline {2.10}Python Multithreading}{8}
