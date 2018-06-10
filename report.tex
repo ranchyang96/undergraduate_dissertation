@@ -106,6 +106,7 @@ To be more specific, we find following features of data centers nowadays:
 	\item Shallow buffer: $<300MB$ for ToR
 	\item Large scale: $>10000$ machines
 \end{enumerate}
+
 As we know, data centers need small RTTs (some even tens of microseconds),
 so abilities to handle burst flows for incasts and support the equality and balancing for concurrent flows matter a lot.
 Traditional TCP/IP stack surely can't do the job.
@@ -266,17 +267,83 @@ Such 0/1 resolution for ECN is not proper because that may cause the late reacti
 The most used library in my scripts is Python Paramiko
 which provides the secure connection for remote command execution and file transmission.
 It's actually a Python implementation of SSHv2 protocol, providing functions of both server and client.
-To be more specific, I contracted them down to four functions, one for connection checking,
+To be more specific, I contracted them to three functions,
 one for remote command execution and the other two for file transmission between local and remote machines.
 Every remote command execution here is using SSH protocol and thus my functions can be implemented by Python Paramiko.
+
+\subsubsection{Remote Command Execution}
+The first one is the code listed here, used for remote command execution.
+
+\begin{lstlisting}[language=Python]
+def ssh1(ip,username,passwd,cmd):
+    try:
+        ssh=paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(ip,22,username,passwd,timeout=5)
+        for m in cmd:
+            print(ip,m)
+            stdin,stdout,stderr=ssh.exec_command(m)
+            err=stderr.readlines()
+            for e in err:
+                print(ip,e)
+        ssh.close()
+    except:
+        print(ip,'ssh1 Error')
+\end{lstlisting}
+
+The commands are actually stored inside the array of ''cmd''.
+All commands inside ''cmd'' are executed in sequence.
+The results are returned from stdin, stdout and stderr.
 
 Apart from the basic points, another tough point is fetching responses of command executions.
 We need to record standard output and sometimes error of the command execution.
 In Python Paramiko, it's packed as the return value of ''exec\_command''.
 We fetch the responses from ''readlines'', both error messages and output messages can be collected.
 
+\subsubsection{Fetch file from remote end}
+The scripts run on the middle machine, which needs to fetch files like Pcap from testbed machines.
+
+\begin{lstlisting}[language=Python]
+def ssh2(ip,port,username,passwd,remote_file,local_file):
+    try:
+        transport=paramiko.Transport((ip,port))
+        transport.connect(username=username,password=passwd)
+        sftp=paramiko.SFTPClient.from_transport(transport)
+        sftp.get(remote_file,local_file)
+        sftp.close()
+        transport.close()
+    except:
+        print(ip,'ssh2 Error')
+\end{lstlisting}
+
+After building a SFTP connection, we can easily fetch the necessary files.
+
+There is another problem about the file location.
+Sadly after using the scripts, relative file locations don't work at all.
+The execution position is not the same with the scripts' location.
+We need to set up the absolute locations for both files so that the scripts can be run successfully.
+
+\subsubsection{Send file to remote end}
+The scripts send specific files to remote ends.
+In my experiment, it's used to send Pcap files from the middle machine to my local machine for packet processing.
+
+\begin{lstlisting}[language=Python]
+def ssh3(ip,port,username,passwd,local_file,remote_file):
+    try:
+        transport=paramiko.Transport((ip,port))
+        transport.connect(username=username,password=passwd)
+        sftp=paramiko.SFTPClient.from_transport(transport)
+        sftp.put(local_file,remote_file)
+        sftp.close()
+        transport.close()
+    except:
+        print(ip,'ssh3 Error')
+\end{lstlisting}
+
+\subsubsection{Filtering of outputs}
 When printing these responses on screen, we filter the necessary messages out.
-I also set to print specific information to files for later checks.
+Sometimes we need several trials to find out the most useful information.
+With the useful lines always having similar starting words, we can redirect them to files for later checks.
 
 \subsection{Python Multithreading}
 
@@ -289,6 +356,35 @@ Function ''join'' can correctly sequence all the steps in the program.
 In my scripts, there are 5 stages divided and each is ensured to be completed with a series of ''join''.
 Thus we don't need to estimate the wait time and can safely wait and watch possible error messages printed on the screen.
 
+The following shows a detailed part about how the scripts are working.
+
+\begin{lstlisting}[language=Python]
+    for i in mac[:j]:
+        ip='192.168.1.'+str(i)
+        b[i]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd0))
+        b[i].start()
+
+    for i in mac[:j]:
+        b[i].join()
+\end{lstlisting}
+
+The list ''mac'' stores all the last part of the IP of remote machines.
+To run commands simultaneously on all remote machines, we use this part of the code.
+Thus the execution can be ensured to start at almost the same time and the next steps 
+will be executed after all these commands are completely executed.
+
+\subsection{Gnuplot}
+
+In my experiments, most figures are drawn using Gnuplot \cite{Gnuplot}.
+Gnuplot is a a portable command-line driven graphing utility for Linux and many other platforms.
+All the experiments are done under Linux and it's easier to install and use since it's command-line functions are easy for me.
+Also, Scripts can also be applied so that large amount of figures can be drawn without the need
+to rewrite many possible plotting scripts.
+
+\subsection{Awk}
+
+Awk \cite{Awk} is a programming language designed for text processing and typically used as a data extraction and reporting tool for Unix-like systems.
+With similar reason for Gnuplot, I choose Awk to make things easier.
 
 \newpage
 \section{Problems of DCQCN}
@@ -381,6 +477,29 @@ If we take a look at the parameter differences, we find the contrast in Table ~\
 \end{table}
 
 These paremeters vary a lot so the internal implementation of ConnectX-4 and Mellanox is a mystery.
+
+The difference becomes more apparent from throughput differences.
+Figure ~\ref{fig:cx4imp} shows the DCQCN implementation on ConnectX-4 adapters.
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=4in]{cx4imp}
+		\caption{DCQCN implementation of ConnectX-4 adapters}
+		\label{fig:cx4imp}
+	\end{center}
+\end{figure}
+
+Figure ~\ref{fig:ns3imp} shows the NS-3 simulation result of throughput with ConnectX-4 parameters.
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=4in]{ns3imp}
+		\caption{NS-3 simulation with ConnectX-4 parameters}
+		\label{fig:ns3imp}
+	\end{center}
+\end{figure}
+
+That's different especially during the starting period in Figure ~\ref{fig:cx4imp} and Figure ~\ref{fig:ns3imp}.
+ConnectX-4 should have made some improvements to the original DCQCN algorithm, especially at the beginning.
+DCQCN starts at line rate but ConnectX-4 starts with speed reservation.
 
 \newpage
 \section{Improvements for DCQCN}
@@ -666,8 +785,23 @@ What we are doing is to accept parameters from the command line execution of the
 This contains the concatenation of mark ''\&'' and other strings.
 ''\&'' is used for simultaneous command execution. Linux System usually has the ability to run over 1000 processes simultaneously.
 
+The repeated part is like this:
+\begin{lstlisting}
+ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p 
+\end{lstlisting}
+We need to repeat such lines with combined port number and ''\&''.
+Such a concatenation will last very long but still tolerable by the machines to execute.
+
+Especially for the receiver (S1), the command may repeat for hundreds of times but the multiprocess upper bound
+is over 1000.
+
 Luckily string operations are easy for Python.
 I'm actually recording the same parts of the commands and adding loops with transformed string from numbers.
+
+The command I use is like this:
+\begin{lstlisting}
+ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p 10010
+\end{lstlisting}
 
 About the detailed information about the commands, we have several specific options set.
 The option ''-R'' is for RDMA connection setup. However, we find that using RDMA traffic for a flow start causes
@@ -726,8 +860,18 @@ With options ''-rrrr'' and ''-nnq'' we transfer the Pcap file into plain text wi
 Among them, we have the timestamp, source IP, source port, destination IP and destination port.
 Thus we can approximately calculate the bandwidth from such information.
 
+The complete command used is here:
+\begin{lstlisting}
+s= ['tcpdump -r /home/yangyuchen/Research/automation/multiflow/'+str(i)+'.pcap -s 60 -i p4p2 -tttt -nnq > /home/yangyuchen/Research/automation/multiflow/'+str(i)+'.txt']
+\end{lstlisting}
+
 For step 2, I use Awk to do the filtering. By limiting the receiver as the only host we regard as an incast receiver, we get all the receiver IP (which is the
 $6^{th}$ term of the plaintext) out of all possible flow receivers.
+
+The complete command used is here:
+\begin{lstlisting}
+s=['awk \'{ if (index($6,"192.168.33.85")==1) { print $0 } }\' /home/yangyuchen/Research/automation/multiflow/'+str(i)+'.txt > /home/yangyuchen/Research/automation/multiflow/'+str(i)+'_data.txt']
+\end{lstlisting}
 
 For step 3, we can only divide all the flows on the same machine using the ports.
 TCP and InfiniBand have its unique port forwarding methods which would surely dismiss the ports I set for them in the ''ib\_send'' commands.
@@ -745,9 +889,19 @@ To do the filtering and counting work, we have an easy command-line tool which i
 Using the option of ''-c'', we can have a count on the packet number with the same timestamp till millisecond digit.
 Therefore, we print the timestamps and the packet numbers. (which has two columns and therefore can be drawn into a figure.
 
+The command used is here:
+\begin{lstlisting}
+s=['cut -c 1-12 /home/yangyuchen/Research/automation/multiflow/'+str(i)+'_divideddata.txt | awk \'{print $1}\' | sort | uniq -c  | awk \'{print $2 " " $1}\' > /home/yangyuchen/Research/automation/multiflow/'+str(i)+'_packets_count.txt']
+\end{lstlisting}
+
+
 Step 5 and step 6 are relatively easy. 
 Record the earliest packet occurs and do subtractions.
 Then we need to add zeroes for those milliseconds which contains no packet to make the figure fluent and complete.
+
+All this part is using C language and these parts are running on local machines.
+Step 5 includes reading files and rewriting to a new file with the same index number but different header in file name.
+Step 6 is simply some traversing over the whole timestamps.
 
 \subsubsection{Figure Plotting}
 
@@ -766,6 +920,33 @@ Here I simply use numbers to choose colors from Gnuplot's color library.
 Most figures shown in the results are drawn using Gnuplot.
 To be more clear about the coloring condition, we can take a look at Figure ~\ref{fig:3_20_0}.
 
+We can also display a simple example of how we plot the figures using Gnuplot.
+\begin{lstlisting}
+set title "packets/millisec"
+set xlabel "reltime"
+set ylabel "packets count"
+
+set style line 1 linecolor rgb "#000000" lw 1
+
+j=ARG1
+k=ARG2
+plot for [i=86:86+j*k-1] '/home/yangyuchen/Research/automation/multiflow/'.i.'_reltime_count.txt' using 1:2 title ''.i with line ls i-85
+
+set terminal png font "/Library/Fonts/Arial.ttf" size 1600,900
+set output "/home/yangyuchen/Research/automation/multiflow/packets_count.png"
+
+replot
+\end{lstlisting}
+
+Here sadly we also have to use absolute file locations.
+
+Those ''*\_reltime\_count.txt'' are stored with two columns with time and packet number respectively.
+And the line colors are displayed with $i-85$ which makes every color starting from 1.
+
+With the title and labels all set, we also need to set the output format as PNG to make it readable by all systems.
+The original picture was super detailed with a pixel resolution of $1600*900$.
+Thus we can see every detail of bandwidth changes, especially at the starting period to make algorithm design easier.
+
 \subsection{Latency and Buffer Usage}
 
 Most steps are similar to the last subsection about bandwidth testing.
@@ -775,6 +956,11 @@ Sometimes this part may last hours and the figure we get is unclear and lines ov
 Latency and buffer usage can reveal the effect of convergence more effectively.
 For latency, I'm using ''ib\_send\_lat'' on each machine which provides average latency and extreme latency during a time period.
 What I collect is simply the average latency which is shown in Table ~\ref{tab:default} and Table ~\ref{tab:improved}.
+
+The command I'm using is listed here.
+\begin{lstlisting}
+ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p 10010
+\end{lstlisting}
 
 With filtered returning messages, I can gain information from the screen output.
 The output should include 8 lines with each describing the result from 1 machine.
@@ -1082,847 +1268,5 @@ Thanks for the support from my family, friends and other people who give me inst
 \bibliographystyle{IEEEtran}
 \bibliography{report}
 
-%----------------------------------------------------------------------------------------
-
-\newpage
-\section*{Appendix}
-
-\subsection*{Codes}
-This part includes my scripts.
-\subsubsection*{default.py}
-This is for parallel configuration for multiple machines at the same time.
-\begin{lstlisting}[language=Python]
-#!/usr/bin/python3
-import paramiko
-import threading
-import time
-
-def ssh2(ip,username,passwd,cmd):
-    try:
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip,22,username,passwd,timeout=5)
-        for m in cmd:
-            print(ip,m)
-            stdin, stdout, stderr = ssh.exec_command(m)
-#			stdin.write("Y")
-#			out = stdout.readlines()
-#			for o in out:
-#				print(o)
-            err = stderr.readlines()
-            for e in err:
-                print(ip,e)
-#		time.sleep(10)
-#		ssh.send(chr(3))
-#		print(ip,'OK')
-        ssh.close()
-    except:
-        print(ip,'Error')
-
-
-if __name__=='__main__':
-    cmd3 = [
-            'sudo sh -c \'echo "0" > /sys/class/net/p4p2/ecn/roce_np/min_time_between_cnps\'',
-
-            'sudo sh -c \'echo "0" > /sys/class/net/p4p2/ecn/roce_np/enable/3\'',
-            'sudo sh -c \'echo "1" > /sys/class/net/p4p2/ecn/roce_np/enable/3\'',
-            'sudo sh -c \'echo "0" > /sys/class/net/p4p2/ecn/roce_rp/enable/3\'',
-            'sudo sh -c \'echo "1" > /sys/class/net/p4p2/ecn/roce_rp/enable/3\'',
-            'sudo sh -c \'echo "0" > /sys/class/net/p4p2/ecn/roce_np/enable/4\'',
-            'sudo sh -c \'echo "1" > /sys/class/net/p4p2/ecn/roce_np/enable/4\'',
-            'sudo sh -c \'echo "0" > /sys/class/net/p4p2/ecn/roce_rp/enable/4\'',
-            'sudo sh -c \'echo "1" > /sys/class/net/p4p2/ecn/roce_rp/enable/4\'',
-
-            'sudo sh -c \'echo "4" > /sys/class/net/p4p2/ecn/roce_rp/dce_tcp_g\'',
-            'sudo sh -c \'echo "1" > /sys/class/net/p4p2/ecn/roce_rp/dce_tcp_rtt\'',
-            'sudo sh -c \'echo "1023" > /sys/class/net/p4p2/ecn/roce_rp/initial_alpha_value\'',
-
-            'sudo sh -c \'echo "0" > /sys/class/net/p4p2/ecn/roce_rp/rate_to_set_on_first_cnp\'',
-            'sudo sh -c \'echo "50" > /sys/class/net/p4p2/ecn/roce_rp/rpg_min_dec_fac\'',
-            #'sudo sh -c \'echo "1" > /sys/class/net/p4p2/ecn/roce_np/rpg_min_rate\'',
-            'sudo sh -c \'echo "11" > /sys/class/net/p4p2/ecn/roce_rp/rpg_gd\'',
-            'sudo sh -c \'echo "4" > /sys/class/net/p4p2/ecn/roce_rp/rate_reduce_monitor_period\'',
-
-            'sudo sh -c \'echo "0" > /sys/class/net/p4p2/ecn/roce_rp/clamp_tgt_rate\'',
-            'sudo sh -c \'echo "1" > /sys/class/net/p4p2/ecn/roce_rp/clamp_tgt_rate_after_time_inc\'',
-            'sudo sh -c \'echo "300" > /sys/class/net/p4p2/ecn/roce_rp/rpg_time_reset\'',
-            'sudo sh -c \'echo "32767" > /sys/class/net/p4p2/ecn/roce_rp/rpg_byte_reset\'',
-            'sudo sh -c \'echo "5" > /sys/class/net/p4p2/ecn/roce_rp/rpg_threshold\'',
-            'sudo sh -c \'echo "5" > /sys/class/net/p4p2/ecn/roce_rp/rpg_ai_rate\'',
-            'sudo sh -c \'echo "50" > /sys/class/net/p4p2/ecn/roce_rp/rpg_hai_rate\'',
-
-            'sudo sh -c \'echo "46" > /sys/class/net/p4p2/ecn/roce_np/cnp_dscp\'',
-            'sudo sh -c \'echo "7" > /sys/class/net/p4p2/ecn/roce_np/cnp_802p_prio\'',
-            ]
-    username = "tian"
-    passwd = "******"
-    threads = []
-    print("Begin......")
-
-    for i in range(85,88):
-        ip = '192.168.1.'+str(i)
-        a=threading.Thread(target=ssh2,args=(ip,username,passwd,cmd3))
-        a.start()
-
-\end{lstlisting}
-
-\subsubsection*{multiflowrun.py}
-This file is the main file which contains all components for all scripts.
-\begin{lstlisting}[language=Python]
-#!/usr/bin/python3
-import paramiko
-import threading
-import time
-import sys
-from subprocess import call
-
-def autorun(cmd):
-    try:
-        call(cmd,shell=True)
-    except:
-        print(cmd,'error')
-
-def ssh1(ip,username,passwd,cmd):
-    try:
-        ssh=paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip,22,username,passwd,timeout=5)
-        for m in cmd:
-            print(ip,m)
-            stdin,stdout,stderr=ssh.exec_command(m)
-            err=stderr.readlines()
-            for e in err:
-                print(ip,e)
-            '''
-            out = stdout.readlines()
-            for o in out:
-                outF.write(o)
-                '''
-        ssh.close()
-    except:
-        print(ip,'ssh1 Error')
-
-def ssh2(ip,port,username,passwd,remote_file,local_file):
-    try:
-        transport=paramiko.Transport((ip,port))
-        transport.connect(username=username,password=passwd)
-        sftp=paramiko.SFTPClient.from_transport(transport)
-        sftp.get(remote_file,local_file)
-        sftp.close()
-        transport.close()
-    except:
-        print(ip,'ssh2 Error')
-
-def ssh3(ip,port,username,passwd,local_file,remote_file):
-    try:
-        transport=paramiko.Transport((ip,port))
-        transport.connect(username=username,password=passwd)
-        sftp=paramiko.SFTPClient.from_transport(transport)
-        sftp.put(local_file,remote_file)
-        sftp.close()
-        transport.close()
-    except:
-        print(ip,'ssh3 Error')
-
-if __name__=='__main__':
-    outF = open('FlowCollection.txt', 'w')
-    cmd0 = ['pkill -f ib_send',
-            #'sudo ntpdate ntp.ubuntu.com'
-            ]
-    cmd1 = [
-            'define',
-            ]
-    cmd = [
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 3 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 7 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 7 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            ]
-    cmd2 = [['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa']]
-    cmd3 = ['sudo tcpdump -c 1000000 -s 60 -B 900000 -i p4p2 -w ~/ycyang/result.pcap']
-    cmd4 = ['/home/yangyuchen/Research/automation/multiflow/process.py ']
-
-    mac = [86, 87, 88, 91, 92, 93, 94, 95]
-    b = [i for i in range(100000)]
-    j=int(sys.argv[1])
-    k=int(sys.argv[2])
-
-    for l in range(0,j+2):
-        cmd2[l][0] = cmd[l][0] + str(10016+l)
-        for m in range(1,k):
-            cmd2[l][0] = cmd2[l][0] + ' &' + cmd[l][0] + str(10016+m*10+l)
-
-    #for l in range(0,j):
-        #print(cmd2[l][0])
-    #sys.exit()
-
-
-    username="tian"
-    passwd="******"
-    port=22
-    threads=[]
-
-    print("Phase 0")
-    ip='192.168.1.85'
-    b[85]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd0))
-    b[85].start()
-    for i in mac:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd0))
-        b[i].start()
-
-    for i in mac:
-        b[i].join()
-    b[85].join()
-
-    str1='for i in {1..'+str(j+2)+'}; do'
-    #str2=' ib_send_bw -R -x 5 -d mlx5_1 -S 3 -D 80 -p $(('
-    str2=' ib_send_bw -x 5 -d mlx5_1 -S 3 -D 80 -p $(('
-    str3=' done'
-    cmd1[0] = str1
-    for i in range(0,k):
-        cmd1[0]=cmd1[0]+str2+str(10015+10*i)+'+i))&'
-    cmd1[0]=cmd1[0]+' done'
-    #print(cmd2[0][0])
-    #print(cmd1[0])
-    #sys.exit()
-
-    username="tian"
-    passwd="******"
-    port=22
-    threads=[]
-    print("Begin......")
-
-    ip='192.168.1.85'
-    a=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd1))
-    a.start()
-
-
-    #time.sleep(10000000)
-
-    time.sleep(10)
-    print("Phase 2")
-    for i in mac[:j]:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd2[i-86]))
-        b[i].start()
-
-    #time.sleep(100)
-
-    sys.exit()
-
-    time.sleep(10)
-    print("Phase 1")
-    for i in mac[:j]:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd3))
-        b[i].start()
-
-
-    for i in mac[:j]:
-        b[i].join()
-
-    
-    print("Phase 3")
-    for i in mac[:j]:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh2,args=(ip,port,username,passwd,'/home/tian/ycyang/result.pcap','/home/ycyang/'+str(i)+'.pcap'))
-
-    for i in mac[:j]:
-        b[i].start()
-
-    for i in mac[:j]:
-        b[i].join()
-    
-    ip='114.212.82.73'
-    port=22
-    username="yangyuchen"
-    passwd="******"
-    threads=[]
-    print("Phase 4")
-    for i in mac[:j]:
-        b[i]=threading.Thread(target=ssh3,args=(ip,port,username,passwd,'/home/ycyang/'+str(i)+'.pcap','/home/yangyuchen/Research/automation/multiflow/'+str(i)+'.pcap'))
-
-    for i in mac[:j]:
-        b[i].start()
-
-    for i in mac[:j]:
-        b[i].join()
-
-    print("Phase 5")
-    cmd4[0]=cmd4[0]+str(j)+' '+str(k)
-    a=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd4))
-    a.start()
-    a.join()
-    
-    print("end")
-\end{lstlisting}
-
-\subsubsection*{fetchconfig.py}
-This file is to fetch the original configurations for us to check on it.
-\begin{lstlisting}[language=Python]
-#!/usr/bin/python3
-import paramiko
-import threading
-import time
-import sys
-
-def ssh2(ip,username,passwd,cmd):
-    try:
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip,22,username,passwd,timeout=5)
-        for m in cmd:
-            stdin, stdout, stderr = ssh.exec_command(m)
-            err = stderr.readlines()
-            for e in err:
-                print(ip,e)
-            out = stdout.readlines()
-            for o in out:
-                print(ip,m,o)
-        ssh.close()
-    except:
-        print(ip,'Error')
-
-
-if __name__=='__main__':
-    cmd = [
-            'cat /sys/class/net/p4p2/ecn/roce_np/min_time_between_cnps',
-            'cat /sys/class/net/p4p2/ecn/roce_np/enable/3',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/enable/3',
-            'cat /sys/class/net/p4p2/ecn/roce_np/enable/4',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/enable/4',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/dce_tcp_g',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/dce_tcp_rtt',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/initial_alpha_value',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rate_to_set_on_first_cnp',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_min_dec_fac',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_min_rate',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_gd',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rate_reduce_monitor_period',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/clamp_tgt_rate',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/clamp_tgt_rate_after_time_inc',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_time_reset',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_byte_reset',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_threshold',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_ai_rate',
-            'cat /sys/class/net/p4p2/ecn/roce_rp/rpg_hai_rate',
-            'cat /sys/class/net/p4p2/ecn/roce_np/cnp_dscp',
-            'cat /sys/class/net/p4p2/ecn/roce_np/cnp_802p_prio',
-            ]
-    username = "tian"
-    passwd = "******"
-    threads = []
-    print("Begin......")
-
-    i = sys.argv[1]
-    ip = '192.168.1.'+i
-    a=threading.Thread(target=ssh2,args=(ip,username,passwd,cmd))
-    a.start()
-\end{lstlisting}
-
-\subsubsection*{multilat.py}
-This file is similar to multiflowrun.py for latency and buffer tests.
-
-\begin{lstlisting}[language=Python]
-#!/usr/bin/python3
-import paramiko
-import threading
-import time
-import sys
-from subprocess import call
-
-def autorun(cmd):
-    try:
-        call(cmd,shell=True)
-    except:
-        print(cmd,'error')
-
-def ssh1(ip,username,passwd,cmd):
-    try:
-        ssh=paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip,22,username,passwd,timeout=5)
-        for m in cmd:
-            print(ip,m)
-            stdin,stdout,stderr=ssh.exec_command(m)
-            err=stderr.readlines()
-            for e in err:
-                if e[0] == 'C':
-                    continue
-                print(ip,e)
-        ssh.close()
-    except:
-        print(ip,'ssh1 Error')
-
-def ssh11(ip,username,passwd,cmd):
-    try:
-        ssh=paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip,22,username,passwd,timeout=5)
-        for m in cmd:
-            print(ip,m)
-            stdin,stdout,stderr=ssh.exec_command(m)
-            out=stdout.readlines()
-            for o in out:
-                if o[2].isdigit() and o[3].isdigit():
-                    outF.write(o)
-                elif o[0].isdigit() or o[1].isdigit() or o[2].isdigit() or o[3].isdigit() or o[4].isdigit():
-                    print(ip,o)
-            err=stderr.readlines()
-            for e in err:
-                if e[0] == 'C':
-                    continue
-                print(ip,e)
-        ssh.close()
-    except:
-        print(ip,'ssh11 Error')
-
-def ssh2(ip,port,username,passwd,remote_file,local_file):
-    try:
-        transport=paramiko.Transport((ip,port))
-        transport.connect(username=username,password=passwd)
-        sftp=paramiko.SFTPClient.from_transport(transport)
-        sftp.get(remote_file,local_file)
-        sftp.close()
-        transport.close()
-    except:
-        print(ip,'ssh2 Error')
-
-def ssh3(ip,port,username,passwd,local_file,remote_file):
-    try:
-        transport=paramiko.Transport((ip,port))
-        transport.connect(username=username,password=passwd)
-        sftp=paramiko.SFTPClient.from_transport(transport)
-        sftp.put(local_file,remote_file)
-        sftp.close()
-        transport.close()
-    except:
-        print(ip,'ssh3 Error')
-
-if __name__=='__main__':
-    outF = open('flowcollect.txt','w')
-    cmd0 = ['pkill -f ib_send',
-            #'sudo ntpdate ntp.ubuntu.com'
-            ]
-    cmd1 = [
-            'define',
-            ]
-    cmd8 = [
-            'define',
-            ]
-    cmd = [
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_bw -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 3 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 7 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 7 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            ]
-    cmd6 = [
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            [' ib_send_lat -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 3 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 7 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 7 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            #[' ib_send_bw -R -S 3 -x 5 -d mlx5_1 192.168.33.85 -D 80 -p '],
-            ]
-    cmd2 = [['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa']]
-    cmd7 = [['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa'],['aa']]
-    cmd3 = ['sudo tcpdump -c 1000000 -s 60 -B 900000 -i p4p2 -w ~/ycyang/result.pcap']
-    cmd4 = ['/home/yangyuchen/Research/automation/multiflow/process.py ']
-
-    mac = [86, 87, 88, 91, 92, 93, 94, 95]
-    b = [i for i in range(100000)]
-    c = [i for i in range(100000)]
-    j=int(sys.argv[1])
-    k=int(sys.argv[2])
-
-    for l in range(0,j+2):
-        cmd2[l][0] = cmd[l][0] + str(10016+l)
-        for m in range(1,k):
-            cmd2[l][0] = cmd2[l][0] + ' &' + cmd[l][0] + str(10016+m*10+l)
-    for l in range(0,j+2):
-        cmd7[l][0] = cmd6[l][0] + str(11001+l)
-
-    #for l in range(0,j):
-        #print(cmd2[l][0])
-    #sys.exit()
-
-
-    username="tian"
-    passwd="******"
-    port=22
-    threads=[]
-
-    print("Phase 0")
-    ip='192.168.1.85'
-    b[85]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd0))
-    b[85].start()
-    for i in mac:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd0))
-        b[i].start()
-
-    for i in mac:
-        b[i].join()
-    b[85].join()
-
-    str1='for i in {1..'+str(j+2)+'}; do'
-    str2=' ib_send_bw -x 5 -d mlx5_1 -S 3 -D 80 -p $(('
-    cmd1[0] = str1
-    for i in range(0,k):
-        cmd1[0]=cmd1[0]+str2+str(10015+10*i)+'+i))&'
-    cmd1[0]=cmd1[0]+' done'
-    '''
-    print(cmd2[0][0])
-    print(cmd1[0])
-    print(cmd8[0])
-    sys.exit()
-    print(cmd7[0][0])
-    print(cmd7[1][0])
-    '''
-    str1='for i in {1..'+str(j+2)+'}; do'
-    str2=' ib_send_lat -x 5 -d mlx5_1 -S 3 -D 80 -p $(('+str(11000)+'+i))&'
-    cmd8[0] = str1
-    cmd8[0]=cmd8[0]+str2+' done'
-
-    username="tian"
-    passwd="******"
-    port=22
-    threads=[]
-    print("Begin......")
-
-    ip='192.168.1.85'
-    a=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd1))
-    a.start()
-
-    d=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd8))
-    d.start()
-
-    #time.sleep(10000000)
-
-    time.sleep(10)
-    print("Phase 2")
-
-    for i in mac[:j]:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh11,args=(ip,username,passwd,cmd2[i-86]))
-        c[i]=threading.Thread(target=ssh11,args=(ip,username,passwd,cmd7[i-86]))
-        #time.sleep(2)
-        b[i].start()
-        c[i].start()
-
-    #time.sleep(100)
-
-    sys.exit()
-
-    time.sleep(10)
-    print("Phase 1")
-    for i in mac[:j]:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd3))
-        b[i].start()
-
-
-    for i in mac[:j]:
-        b[i].join()
-
-    
-    print("Phase 3")
-    for i in mac[:j]:
-        ip='192.168.1.'+str(i)
-        b[i]=threading.Thread(target=ssh2,args=(ip,port,username,passwd,'/home/tian/ycyang/result.pcap','/home/ycyang/'+str(i)+'.pcap'))
-
-    for i in mac[:j]:
-        b[i].start()
-
-    for i in mac[:j]:
-        b[i].join()
-    
-    ip='114.212.82.73'
-    port=22
-    username="yangyuchen"
-    passwd="******"
-    threads=[]
-    print("Phase 4")
-    for i in mac[:j]:
-        b[i]=threading.Thread(target=ssh3,args=(ip,port,username,passwd,'/home/ycyang/'+str(i)+'.pcap','/home/yangyuchen/Research/automation/multiflow/'+str(i)+'.pcap'))
-
-    for i in mac[:j]:
-        b[i].start()
-
-    for i in mac[:j]:
-        b[i].join()
-
-    print("Phase 5")
-    cmd4[0]=cmd4[0]+str(j)+' '+str(k)
-    a=threading.Thread(target=ssh1,args=(ip,username,passwd,cmd4))
-    a.start()
-    a.join()
-    
-    print("end")
-\end{lstlisting}
-
-\subsubsection*{process.py}
-This file is the main script on local machine which contains all operations on local machine.
-\begin{lstlisting}[language=Python]
-#!/usr/bin/python3
-import sys
-import os
-import threading
-from subprocess import call
-
-def autorun(cmd):
-    try:
-        call(cmd,shell=True)
-    except:
-        print(cmd,'error')
-
-if __name__=='__main__':
-    a=[i for i in range(100)]
-    mac = [2, 3, 4, 5, 6]
-    j=int(sys.argv[1])
-    for i in mac[:j]:
-        s=['tcpdump -r /home/yangyuchen/Research/automation/'+str(i)+'.pcap -s 60 -i p4p1 -tttt -nnq > /home/yangyuchen/Research/automation/'+str(i)+'.txt']
-        a[i]=threading.Thread(target=autorun,args=(s))
-        a[i].start()
-    for i in mac[:j]:
-        a[i].join()
-
-    for i in mac[:j]:
-        s=['awk \'{ if (index($6,"172.16.102.1")==1) { print $0 } }\' /home/yangyuchen/Research/automation/'+str(i)+'.txt > /home/yangyuchen/Research/automation/'+str(i)+'_data.txt']
-        a[i]=threading.Thread(target=autorun,args=(s))
-        a[i].start()
-    for i in mac[:j]:
-        a[i].join()
-
-    for i in mac[:j]:
-        s=['cut -c 12-24 /home/yangyuchen/Research/automation/'+str(i)+'_data.txt | awk \'{print $1}\' | sort | uniq -c  | awk \'{print $2 " " $1}\' > /home/yangyuchen/Research/automation/'+str(i)+'_packets_count.txt']
-        a[i]=threading.Thread(target=autorun,args=(s))
-        a[i].start()
-    for i in mac[:j]:
-        a[i].join()
-
-    for i in mac[:j]:
-        s=['/home/yangyuchen/Research/automation/reltime < /home/yangyuchen/Research/automation/'+str(i)+'_packets_count.txt > /home/yangyuchen/Research/automation/'+str(i)+'_reltime_count.txt']
-        a[i]=threading.Thread(target=autorun,args=(s))
-        a[i].start()
-    for i in mac[:j]:
-        a[i].join()
-
-    for i in mac[:j]:
-        s=['/home/yangyuchen/Research/automation/addzeros < /home/yangyuchen/Research/automation/'+str(i)+'_reltime_count.txt > /home/yangyuchen/Research/automation/'+str(i)+'_final_count.txt']
-        a[i]=threading.Thread(target=autorun,args=(s))
-        a[i].start()
-    for i in mac[:j]:
-        a[i].join()
-
-    s=['gnuplot -c /home/yangyuchen/Research/automation/new.plot '+str(j)]
-    b=threading.Thread(target=autorun,args=(s))
-    b.start()
-    b.join()
-
-    print('end');
-\end{lstlisting}
-
-\subsubsection*{reltime.c}
-This is to transfer absolute timestamps into relative times.
-\begin{lstlisting}[language=C]
-#include<stdio.h>
-int main(){
-	int a,b,c;
-	double t0=0;
-	double d,t;
-	while(scanf("%d:%d:%lf %d",&a,&b,&d,&c)!=EOF){
-		if(t0==0)
-			t0=d+60*b+3600*a;
-		t=d+60*b+3600*a;
-		printf("%lf %d\n",t-t0,c);
-	}
-	return 0;
-}
-\end{lstlisting}
-
-\subsubsection*{addzeros.c}
-This is to add zeroes for those milliseconds that has no packets captured.
-\begin{lstlisting}[language=C]
-#include<stdio.h>
-int main(){
-	double a;
-	double cur;
-	int b;
-	cur=0;
-	while(scanf("%lf%d",&a,&b)!=EOF){
-		if(cur!=a)
-			for(;cur<a;cur+=0.001)
-				printf("%lf 0\n",cur);
-		printf("%lf %d\n",a,b);
-		cur+=0.001;
-	}
-	return 0;
-}
-\end{lstlisting}
-
-\subsubsection*{divide.c}
-This is for division of different port numbers, i.e., division of flows on a same machine.
-\begin{lstlisting}[language=C]
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-int main(int argc, char** argv){
-	FILE* fp[100];
-	FILE* input;
-	char input_file[100];
-	char output_files[100][100];
-	char str[100];
-	int length,serverid,servernum,flownum;
-	int ports[100];
-	serverid=0;
-	int i,l;
-	int a,b,c,d,port;
-	int cur=0;
-	char time[100];
-	l=strlen(argv[1]);
-	for(i=0;i<l;i++){
-		serverid*=10;
-		serverid+=argv[1][i]-'0';
-	}
-	servernum=0;
-	l=strlen(argv[2]);
-	for(i=0;i<l;i++){
-		servernum*=10;
-		servernum+=argv[2][i]-'0';
-	}
-	flownum=0;
-	l=strlen(argv[3]);
-	for(i=0;i<l;i++){
-		flownum*=10;
-		flownum+=argv[3][i]-'0';
-	}
-	//printf("%d %d %d\n",serverid,servernum,flownum);
-	strcpy(input_file,"/home/ranchyang96/Research/automation/final/");
-	i=strlen(input_file);
-	strcpy(input_file+i,argv[1]);
-	strcpy(input_file+i+2,"_data.txt");
-	input=fopen(input_file,"r");
-	FILE* f=fopen("/home/ranchyang96/Research/automation/final/out","a");
-	fprintf(f,"serverid:%d\tservernum:%d\tflownum:%d\n",serverid,servernum,flownum);
-	while(fscanf(input,"%s",&str)!=EOF){
-		fscanf(input,"%s",&time);
-		fscanf(input,"%s",&str);
-		fscanf(input,"%d.%d.%d.%d.%d",&a,&b,&c,&d,&port);
-		fscanf(input,"%s",&str);
-		fscanf(input,"%s",&str);
-		fscanf(input,"%s",&str);
-		fscanf(input,"%s",&str);
-		if(strcmp(str,"length")!=0)
-			continue;
-		fscanf(input,"%d",&length);
-		if(length<1000)
-			continue;
-		for(i=0;i<cur;i++)
-			if(port==ports[i]){
-				fprintf(fp[i],"%s\n",time);
-				break;
-			}
-		if(i==cur){
-			ports[cur]=port;
-			if(serverid>99){
-				strcpy(output_files[cur],"/home/ranchyang96/Research/automation/final/");
-				i=strlen(output_files[cur]);
-				output_files[cur][i]=serverid/100+'0';
-				output_files[cur][i+1]=(serverid/10)%10+'0';
-				output_files[cur][i+2]=serverid%10+'0';
-				strcpy(output_files[cur]+i+3,"_divideddata.txt");
-				fp[cur]=fopen(output_files[cur],"w");
-			}
-			else{
-				strcpy(output_files[cur],"/home/ranchyang96/Research/automation/final/");
-				i=strlen(output_files[cur]);
-				output_files[cur][i]=(serverid/10)%10+'0';
-				output_files[cur][i+1]=serverid%10+'0';
-				strcpy(output_files[cur]+i+2,"_divideddata.txt");
-				fp[cur]=fopen(output_files[cur],"w");
-			}
-			fprintf(fp[cur],"%s\n",time);
-			cur++;
-			serverid+=servernum+1;
-		}
-	}
-	fprintf(f,"cur:%d\tfinal:%d\n",cur,serverid);
-	fclose(f);
-
-	for(i=0;i<cur;i++)
-		fclose(fp[i]);
-	fclose(input);
-	return 0;
-}
-\end{lstlisting}
-
-\subsubsection*{mul.plot}
-This is for Gnuplot to draw the bandwidth figure.
-\begin{lstlisting}
-set title "packets/millisec"
-set xlabel "reltime"
-set ylabel "packets count"
-
-set style line 1 linecolor rgb "#000000" lw 1
-
-plot '86_reltime_count.txt' using 1:2 title "86" with line ls 1, \
-	'87_reltime_count.txt' using 1:2 title "87" with line ls 2
-
-set terminal png font "/Library/Fonts/Arial.ttf" size 3200,1800
-set output "packets_count.png"
-
-replot
-\end{lstlisting}
 
 \end{document}

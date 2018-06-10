@@ -44,6 +44,20 @@ Y.~Zhu, H.~Eran, D.~Firestone, C.~Guo, M.~Lipshteyn, Y.~Liron, J.~Padhye,
   rdma deployments,'' \emph{Acm Sigcomm Computer Communication Review},
   vol.~45, no.~4, pp. 523--536, 2015.
 
+\bibitem{RoCEv2}
+\emph{RoCEv2}, \url{https://cw.infiniband.org/document/dl/7781}, Infiniband
+  Trade Association, 2014.
+
+\bibitem{Gnuplot}
+\BIBentryALTinterwordspacing
+``Gnuplot.'' [Online]. Available: \url{http://www.gnuplot.info/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Awk}
+\BIBentryALTinterwordspacing
+``Awk.'' [Online]. Available: \url{https://en.wikipedia.org/wiki/AWK}
+\BIBentrySTDinterwordspacing
+
 \bibitem{NS3}
 \BIBentryALTinterwordspacing
 ``The ns3 simulator.'' [Online]. Available: \url{https://www.nsnam.org/}
@@ -66,13 +80,9 @@ Y.~Zhu, H.~Eran, D.~Firestone, C.~Guo, M.~Lipshteyn, Y.~Liron, J.~Padhye,
   \url{https://community.mellanox.com/docs/DOC-2790}
 \BIBentrySTDinterwordspacing
 
-\bibitem{RoCEv2}
-\emph{RoCEv2}, \url{https://cw.infiniband.org/document/dl/7781}, Infiniband
-  Trade Association, 2014.
-
 \bibitem{credit}
-D.~Han, D.~Han, and D.~Han, ``Credit-scheduled delay-bounded congestion control
-  for datacenters,'' in \emph{Conference of the ACM Special Interest Group on
-  Data Communication}, 2017, pp. 239--252.
+D.~Han, ``Credit-scheduled delay-bounded congestion control for datacenters,''
+  in \emph{Conference of the ACM Special Interest Group on Data Communication},
+  2017, pp. 239--252.
 
 \end{thebibliography}
