@@ -1,46 +1,46 @@
-\contentsline {section}{\numberline {1}Introduction}{3}
-\contentsline {section}{\numberline {2}Background}{5}
-\contentsline {subsection}{\numberline {2.1}Mellanox switch and ConnectX-4}{5}
-\contentsline {subsection}{\numberline {2.2}InfiniBand}{5}
-\contentsline {subsection}{\numberline {2.3}Remote Direct Memory Access}{5}
-\contentsline {subsection}{\numberline {2.4}RoCE v2}{5}
-\contentsline {subsection}{\numberline {2.5}Priority-based Flow Control}{6}
-\contentsline {subsection}{\numberline {2.6}Explicit Congestion Notification}{6}
-\contentsline {subsection}{\numberline {2.7}Data Center TCP}{6}
-\contentsline {subsection}{\numberline {2.8}DCQCN}{6}
-\contentsline {subsection}{\numberline {2.9}Python Paramiko Library}{7}
-\contentsline {subsection}{\numberline {2.10}Python Multithreading}{8}
-\contentsline {section}{\numberline {3}Problems of DCQCN}{8}
-\contentsline {subsection}{\numberline {3.1}Testbed experiments}{8}
-\contentsline {subsection}{\numberline {3.2}NS3 Simulation}{8}
-\contentsline {subsection}{\numberline {3.3}Difference between DCQCN and ConnectX-4 implementation}{9}
-\contentsline {section}{\numberline {4}Improvements for DCQCN}{9}
-\contentsline {subsection}{\numberline {4.1}Congestion Point}{10}
-\contentsline {subsection}{\numberline {4.2}Notification Point}{10}
-\contentsline {subsection}{\numberline {4.3}Reaction Point}{10}
-\contentsline {section}{\numberline {5}Implementation}{12}
-\contentsline {subsection}{\numberline {5.1}Switch Configuration}{12}
-\contentsline {subsubsection}{\numberline {5.1.1}VLAN}{13}
-\contentsline {subsubsection}{\numberline {5.1.2}Port mirroring}{13}
-\contentsline {subsubsection}{\numberline {5.1.3}PFC}{13}
-\contentsline {subsubsection}{\numberline {5.1.4}ECN}{14}
-\contentsline {subsubsection}{\numberline {5.1.5}Buffer}{14}
-\contentsline {subsubsection}{\numberline {5.1.6}Additional Configurations}{14}
-\contentsline {subsection}{\numberline {5.2}NIC Configuration}{14}
-\contentsline {subsection}{\numberline {5.3}Experiment Process}{15}
-\contentsline {subsection}{\numberline {5.4}Ability to Generate CNP}{15}
-\contentsline {subsection}{\numberline {5.5}Bandwidth Testing}{16}
-\contentsline {subsubsection}{\numberline {5.5.1}State Refresh}{16}
-\contentsline {subsubsection}{\numberline {5.5.2}Time Synchronization}{16}
-\contentsline {subsubsection}{\numberline {5.5.3}Tcpdump Start}{17}
-\contentsline {subsubsection}{\numberline {5.5.4}ib\_send\_bw Server Client Starter}{17}
-\contentsline {subsubsection}{\numberline {5.5.5}File Transmission}{18}
-\contentsline {subsubsection}{\numberline {5.5.6}Pcap Parsing}{18}
-\contentsline {subsubsection}{\numberline {5.5.7}Figure Plotting}{19}
-\contentsline {subsection}{\numberline {5.6}Latency and Buffer Usage}{20}
-\contentsline {section}{\numberline {6}Results}{20}
-\contentsline {subsection}{\numberline {6.1}NIC Ability to Generate CNPs}{20}
-\contentsline {subsection}{\numberline {6.2}Bandwidth Condition for Small-Scale Incast}{22}
-\contentsline {subsection}{\numberline {6.3}Latency and Buffer Usage of Large-Scale Incast}{23}
-\contentsline {subsection}{\numberline {6.4}Results from NS3 Simulations}{25}
-\contentsline {section}{\numberline {7}Conclusion and Future Work}{26}
+\contentsline {section}{\numberline {1}Introduction}{4}
+\contentsline {section}{\numberline {2}Background}{6}
+\contentsline {subsection}{\numberline {2.1}Mellanox switch and ConnectX-4}{6}
+\contentsline {subsection}{\numberline {2.2}InfiniBand}{6}
+\contentsline {subsection}{\numberline {2.3}Remote Direct Memory Access}{6}
+\contentsline {subsection}{\numberline {2.4}RoCE v2}{6}
+\contentsline {subsection}{\numberline {2.5}Priority-based Flow Control}{7}
+\contentsline {subsection}{\numberline {2.6}Explicit Congestion Notification}{7}
+\contentsline {subsection}{\numberline {2.7}Data Center TCP}{7}
+\contentsline {subsection}{\numberline {2.8}DCQCN}{7}
+\contentsline {subsection}{\numberline {2.9}Python Paramiko Library}{8}
+\contentsline {subsection}{\numberline {2.10}Python Multithreading}{9}
+\contentsline {section}{\numberline {3}Problems of DCQCN}{10}
+\contentsline {subsection}{\numberline {3.1}Testbed experiments}{10}
+\contentsline {subsection}{\numberline {3.2}NS3 Simulation}{10}
+\contentsline {subsection}{\numberline {3.3}Difference between DCQCN and ConnectX-4 implementation}{10}
+\contentsline {section}{\numberline {4}Improvements for DCQCN}{13}
+\contentsline {subsection}{\numberline {4.1}Congestion Point}{13}
+\contentsline {subsection}{\numberline {4.2}Notification Point}{13}
+\contentsline {subsection}{\numberline {4.3}Reaction Point}{14}
+\contentsline {section}{\numberline {5}Implementation}{16}
+\contentsline {subsection}{\numberline {5.1}Switch Configuration}{17}
+\contentsline {subsubsection}{\numberline {5.1.1}VLAN}{17}
+\contentsline {subsubsection}{\numberline {5.1.2}Port mirroring}{17}
+\contentsline {subsubsection}{\numberline {5.1.3}PFC}{18}
+\contentsline {subsubsection}{\numberline {5.1.4}ECN}{18}
+\contentsline {subsubsection}{\numberline {5.1.5}Buffer}{18}
+\contentsline {subsubsection}{\numberline {5.1.6}Additional Configurations}{18}
+\contentsline {subsection}{\numberline {5.2}NIC Configuration}{19}
+\contentsline {subsection}{\numberline {5.3}Experiment Process}{19}
+\contentsline {subsection}{\numberline {5.4}Ability to Generate CNP}{20}
+\contentsline {subsection}{\numberline {5.5}Bandwidth Testing}{20}
+\contentsline {subsubsection}{\numberline {5.5.1}State Refresh}{20}
+\contentsline {subsubsection}{\numberline {5.5.2}Time Synchronization}{21}
+\contentsline {subsubsection}{\numberline {5.5.3}Tcpdump Start}{21}
+\contentsline {subsubsection}{\numberline {5.5.4}ib\_send\_bw Server Client Starter}{21}
+\contentsline {subsubsection}{\numberline {5.5.5}File Transmission}{22}
+\contentsline {subsubsection}{\numberline {5.5.6}Pcap Parsing}{22}
+\contentsline {subsubsection}{\numberline {5.5.7}Figure Plotting}{24}
+\contentsline {subsection}{\numberline {5.6}Latency and Buffer Usage}{24}
+\contentsline {section}{\numberline {6}Results}{25}
+\contentsline {subsection}{\numberline {6.1}NIC Ability to Generate CNPs}{25}
+\contentsline {subsection}{\numberline {6.2}Bandwidth Condition for Small-Scale Incast}{26}
+\contentsline {subsection}{\numberline {6.3}Latency and Buffer Usage of Large-Scale Incast}{27}
+\contentsline {subsection}{\numberline {6.4}Results from NS3 Simulations}{30}
+\contentsline {section}{\numberline {7}Conclusion and Future Work}{32}

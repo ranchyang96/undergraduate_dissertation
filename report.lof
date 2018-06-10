@@ -1,0 +1,16 @@
+\contentsline {figure}{\numberline {1}{\ignorespaces ECN Marking Probability for CP in DCQCN}}{8}
+\contentsline {figure}{\numberline {2}{\ignorespaces DCQCN fails to converge in 10Gbps links}}{11}
+\contentsline {figure}{\numberline {3}{\ignorespaces DCQCN fails to converge in 40Gbps links}}{11}
+\contentsline {figure}{\numberline {4}{\ignorespaces RP algorithm from DCQCN}}{14}
+\contentsline {figure}{\numberline {5}{\ignorespaces RP algorithm from DCQCN+}}{16}
+\contentsline {figure}{\numberline {6}{\ignorespaces Topology for multi-flow tests}}{17}
+\contentsline {figure}{\numberline {7}{\ignorespaces CNP interval test}}{25}
+\contentsline {figure}{\numberline {8}{\ignorespaces 2:1 incast bandwidth}}{26}
+\contentsline {figure}{\numberline {9}{\ignorespaces 10:1 incast bandwidth}}{27}
+\contentsline {figure}{\numberline {10}{\ignorespaces 60:1 incast bandwidth}}{27}
+\contentsline {figure}{\numberline {11}{\ignorespaces Buffer usage difference between DCQCN and DCQCN+}}{29}
+\contentsline {figure}{\numberline {12}{\ignorespaces Latency difference between DCQCN and DCQCN+}}{30}
+\contentsline {figure}{\numberline {13}{\ignorespaces Queue length trends of 10Gbps in DCQCN+}}{31}
+\contentsline {figure}{\numberline {14}{\ignorespaces Throughput trends of 10Gbps in DCQCN+}}{31}
+\contentsline {figure}{\numberline {15}{\ignorespaces Queue length trends of 40Gbps in DCQCN+}}{32}
+\contentsline {figure}{\numberline {16}{\ignorespaces Throughput trends of 40Gbps in DCQCN+}}{32}
