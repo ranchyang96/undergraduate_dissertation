@@ -5,6 +5,10 @@
 \citation{dctcp}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{5}}
 \citation{dcqcn}
+\citation{ICTCP}
+\citation{MapReduce}
+\citation{Ceph}
+\citation{Guo2016RDMA}
 \citation{RoCEv2}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Background}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Mellanox switch and ConnectX-4}{7}}
@@ -12,22 +16,33 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Remote Direct Memory Access}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}RoCE v2}{7}}
 \citation{dcqcn}
+\citation{Guo2016RDMA}
+\citation{dcqcn}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Priority-based Flow Control}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Explicit Congestion Notification}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.7}Data Center TCP}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.8}DCQCN}{8}}
+\citation{TIMELY}
+\citation{DCQCNandTIMELY}
+\citation{AnalysisofDCTCP}
+\citation{AnalysisofQCN}
+\citation{DCQCNandTIMELY}
+\citation{ECNMarking}
+\citation{AnalysisofECN}
+\citation{AnalysisofSmallBuffers}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces ECN Marking Probability for CP in DCQCN}}{9}}
 \newlabel{fig:ECNMarking}{{1}{9}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.9}Python Paramiko Library}{9}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.9.1}Remote Command Execution}{10}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.9.2}Fetch file from remote end}{10}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.9.3}Send file to remote end}{11}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.9.4}Filtering of outputs}{11}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.10}Python Multithreading}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.9}Other related work}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.10}Python Paramiko Library}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.10.1}Remote Command Execution}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.10.2}Fetch file from remote end}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.10.3}Send file to remote end}{11}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.10.4}Filtering of outputs}{11}}
 \citation{Gnuplot}
 \citation{Awk}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.11}Gnuplot}{12}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.12}Awk}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.11}Python Multithreading}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.12}Gnuplot}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.13}Awk}{12}}
 \citation{NS3}
 \citation{Tcpdump}
 \citation{DCQCNsim}
@@ -96,32 +111,46 @@
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces DCQCN buffer usage and latency}}{35}}
 \newlabel{tab:improved}{{3}{35}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Results from NS3 Simulations}{35}}
+\citation{CLOS}
+\citation{CLOS}
 \@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Buffer usage difference between DCQCN and DCQCN+}}{36}}
 \newlabel{fig:buffer}{{13}{36}}
+\citation{credit}
 \@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Latency difference between DCQCN and DCQCN+}}{37}}
 \newlabel{fig:latency}{{14}{37}}
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Queue length trends of 10Gbps in DCQCN+}}{37}}
-\newlabel{fig:simq10}{{15}{37}}
 \@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion and Future Work}{37}}
-\citation{credit}
-\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Throughput trends of 10Gbps in DCQCN+}}{38}}
-\newlabel{fig:simt10}{{16}{38}}
-\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Queue length trends of 40Gbps in DCQCN+}}{38}}
-\newlabel{fig:simq40}{{17}{38}}
 \bibstyle{IEEEtran}
 \bibdata{report}
 \bibcite{ECN}{1}
 \bibcite{QCN}{2}
 \bibcite{PFC}{3}
-\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Throughput trends of 40Gbps in DCQCN+}}{39}}
-\newlabel{fig:simt40}{{18}{39}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Queue length trends of 10Gbps in DCQCN+}}{38}}
+\newlabel{fig:simq10}{{15}{38}}
 \bibcite{dctcp}{4}
 \bibcite{dcqcn}{5}
-\bibcite{RoCEv2}{6}
-\bibcite{Gnuplot}{7}
-\bibcite{Awk}{8}
-\bibcite{NS3}{9}
-\bibcite{Tcpdump}{10}
-\bibcite{DCQCNsim}{11}
-\bibcite{MellanoxOfficial}{12}
-\bibcite{credit}{13}
+\bibcite{ICTCP}{6}
+\bibcite{MapReduce}{7}
+\bibcite{Ceph}{8}
+\bibcite{Guo2016RDMA}{9}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Throughput trends of 10Gbps in DCQCN+}}{39}}
+\newlabel{fig:simt10}{{16}{39}}
+\bibcite{RoCEv2}{10}
+\bibcite{TIMELY}{11}
+\bibcite{DCQCNandTIMELY}{12}
+\bibcite{AnalysisofDCTCP}{13}
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Queue length trends of 40Gbps in DCQCN+}}{40}}
+\newlabel{fig:simq40}{{17}{40}}
+\bibcite{AnalysisofQCN}{14}
+\bibcite{ECNMarking}{15}
+\bibcite{AnalysisofECN}{16}
+\bibcite{AnalysisofSmallBuffers}{17}
+\bibcite{Gnuplot}{18}
+\bibcite{Awk}{19}
+\bibcite{NS3}{20}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Throughput trends of 40Gbps in DCQCN+}}{41}}
+\newlabel{fig:simt40}{{18}{41}}
+\bibcite{Tcpdump}{21}
+\bibcite{DCQCNsim}{22}
+\bibcite{MellanoxOfficial}{23}
+\bibcite{CLOS}{24}
+\bibcite{credit}{25}

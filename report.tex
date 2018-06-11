@@ -149,6 +149,14 @@ RP side.
 This interval is also greatly limited by hardware ability.
 Detailed information is also be mentioned in later sections.
 
+However, DCQCN has performance problems when large-scale incasts happen.
+When many hosts send data simultaneously to a same receiver, incasts happen \cite{ICTCP}.
+Such traffic pattern is commmon for many data center applications such as MapReduce shuffling \cite{MapReduce}
+and distributed Storage such as Ceph \cite{Ceph}.
+This leads to large queue length of the receiver buffer, which will greatly increase queueing latency.
+Also, this can generate PFC bursts according to \cite{Guo2016RDMA}, which may generate victim flows.
+
+
 In the end here is a brief introduction of the most important points about our new method DCQCN+.
 DCQCN+ deploys dynamic rate control mechanisms to adapt to incast of different scales instead of the fixed rate control for DCQCN.
 What I'm in charge of are the testbed configuration and experiments.
@@ -210,7 +218,7 @@ No buffer packet overflow is a must for data center networks.
 However, PFC actually does nothing to make the latency low.
 When the receiver buffer is almost full, the packets inside the buffer queue up for a long time which makes the queueing latency
 extremely high.
-Such unfairness and high latency are fatal to data centers and we hope to make up the drawbacks.
+Such unfairness, victim flows \cite{dcqcn}, deadlock \cite{Guo2016RDMA} and high latency are fatal to data centers and we hope to make up the drawbacks.
 
 \subsection{Explicit Congestion Notification}
 Explicit Congestion Notification is designed to indicate congestion to the sender.
@@ -261,6 +269,16 @@ which is shown in Figure ~\ref{fig:ECNMarking}.
 Such marking probability is a brandnew idea from QCN.
 Previously marking ECN or not is a fixed thing without possibility.
 Such 0/1 resolution for ECN is not proper because that may cause the late reaction from senders.
+
+\subsection{Other related work}
+
+All the congestion control schemes we mention here start to react the congestion after it happens.
+TIMELY\cite{TIMELY} is another congestion control scheme for RoCEv2 that is based on RTT reaction.
+\cite{DCQCNandTIMELY} compares DCQCN and TIMELY on different aspects of performance,
+and claims that ECN is a better congestion signal compared to delay.
+\cite{AnalysisofDCTCP},\cite{AnalysisofQCN} and \cite{DCQCNandTIMELY} analyze the stability and convergence of similar congestion control schemes.
+\cite{ECNMarking} improves ECN with Micro-burst traffic using Combined Enqueue and Dequeue Marking (CEDM).
+\cite{AnalysisofECN}\cite{AnalysisofSmallBuffers} give theoretical analysis of ECN.
 
 \subsection{Python Paramiko Library}
 
@@ -1200,7 +1218,7 @@ and throughput trends in Figure ~\ref{fig:simt40}.
 
 \begin{figure}[h!]
 	\begin{center}
-		\includegraphics[width=4in]{simq10}
+		\includegraphics[width=6in]{simq10}
 		\caption{Queue length trends of 10Gbps in DCQCN+}
 		\label{fig:simq10}
 	\end{center}
@@ -1208,7 +1226,7 @@ and throughput trends in Figure ~\ref{fig:simt40}.
 
 \begin{figure}[h!]
 	\begin{center}
-		\includegraphics[width=4in]{simt10}
+		\includegraphics[width=6in]{simt10}
 		\caption{Throughput trends of 10Gbps in DCQCN+}
 		\label{fig:simt10}
 	\end{center}
@@ -1216,7 +1234,7 @@ and throughput trends in Figure ~\ref{fig:simt40}.
 
 \begin{figure}[h!]
 	\begin{center}
-		\includegraphics[width=4in]{simq40}
+		\includegraphics[width=6in]{simq40}
 		\caption{Queue length trends of 40Gbps in DCQCN+}
 		\label{fig:simq40}
 	\end{center}
@@ -1224,7 +1242,7 @@ and throughput trends in Figure ~\ref{fig:simt40}.
 
 \begin{figure}[h!]
 	\begin{center}
-		\includegraphics[width=4in]{simt40}
+		\includegraphics[width=6in]{simt40}
 		\caption{Throughput trends of 40Gbps in DCQCN+}
 		\label{fig:simt40}
 	\end{center}
@@ -1234,6 +1252,10 @@ We can see that the results are much better than the testbed results.
 That makes sense since simulation does better in details.
 Simulation can actually implement the timer updates mentioned in DCQCN+ but testbed can only use static parameters and some parameters
 aren't accurate.
+
+However, today's Data Center Network has hundreds or thougsands of hosts using CLOS \cite{CLOS} topology.
+We also conduct experiments under the CLOS topology of 2410 nodes similar to CLOS \cite{CLOS}.
+Average throughput when converged is about 95\%.
 
 Compared with original DCQCN, DCQCN+ has 20 times smaller queue length, which is 20 times smaller queueing latency.
 

@@ -44,9 +44,69 @@ Y.~Zhu, H.~Eran, D.~Firestone, C.~Guo, M.~Lipshteyn, Y.~Liron, J.~Padhye,
   rdma deployments,'' \emph{Acm Sigcomm Computer Communication Review},
   vol.~45, no.~4, pp. 523--536, 2015.
 
+\bibitem{ICTCP}
+H.~Wu, Z.~Feng, C.~Guo, and Y.~Zhang, ``Ictcp:incast congestion control for tcp
+  in data center networks,'' in \emph{International Conference}, 2010, pp.
+  1--12.
+
+\bibitem{MapReduce}
+\BIBentryALTinterwordspacing
+J.~DEAN, ``Mapreduce: Simplified data processing on large clusters,''
+  \emph{OSDI'04, Sixth Symposium on Operating System Design and
+  Implementation}, pp. 137--150, 2004. [Online]. Available:
+  \url{https://ci.nii.ac.jp/naid/10026764358/en/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Ceph}
+\BIBentryALTinterwordspacing
+``Ceph.'' [Online]. Available: \url{https://ceph.com/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Guo2016RDMA}
+C.~Guo, H.~Wu, Z.~Deng, G.~Soni, J.~Ye, J.~Padhye, and M.~Lipshteyn, ``Rdma
+  over commodity ethernet at scale,'' in \emph{Conference on ACM SIGCOMM 2016
+  Conference}, 2016, pp. 202--215.
+
 \bibitem{RoCEv2}
 \emph{RoCEv2}, \url{https://cw.infiniband.org/document/dl/7781}, Infiniband
   Trade Association, 2014.
+
+\bibitem{TIMELY}
+R.~Mittal, V.~T. Lam, N.~Dukkipati, E.~Blem, H.~Wassel, M.~Ghobadi, A.~Vahdat,
+  Y.~Wang, D.~Wetherall, and D.~Zats, ``Timely: Rtt-based congestion control
+  for the datacenter,'' in \emph{ACM Conference on Special Interest Group on
+  Data Communication}, 2015, pp. 537--550.
+
+\bibitem{DCQCNandTIMELY}
+Y.~Zhu, M.~Ghobadi, V.~Misra, and J.~Padhye, ``Ecn or delay: Lessons learnt
+  from analysis of dcqcn and timely,'' in \emph{International on Conference on
+  Emerging NETWORKING Experiments and Technologies}, 2016, pp. 313--327.
+
+\bibitem{AnalysisofDCTCP}
+M.~Alizadeh, A.~Javanmard, and B.~Prabhakar, ``Analysis of dctcp: stability,
+  convergence, and fairness,'' in \emph{ACM SIGMETRICS Joint International
+  Conference on Measurement and Modeling of Computer Systems}, 2011, pp.
+  73--84.
+
+\bibitem{AnalysisofQCN}
+M.~Alizadeh, A.~Kabbani, B.~Atikoglu, and B.~Prabhakar, ``Stability analysis of
+  qcn: the averaging principle,'' \emph{ACM SIGMETRICS Performance Evaluation
+  Review}, vol.~39, no.~1, pp. 49--60, 2011.
+
+\bibitem{ECNMarking}
+D.~Shan and F.~Ren, ``Improving ecn marking scheme with micro-burst traffic in
+  data center networks,'' in \emph{INFOCOM 2017 - IEEE Conference on Computer
+  Communications, IEEE}, 2017, pp. 1--9.
+
+\bibitem{AnalysisofECN}
+H.~Balakrishnan, N.~Dukkipati, N.~Mckeown, and C.~J. Tomlin, ``Stability
+  analysis of explicit congestion control protocols,'' \emph{Communications
+  Letters IEEE}, vol.~11, no.~10, pp. 823--825, 2007.
+
+\bibitem{AnalysisofSmallBuffers}
+F.~Kelly, G.~Raina, and T.~Voice, ``Stability and fairness of explicit
+  congestion control with small buffers,'' \emph{Acm Sigcomm Computer
+  Communication Review}, vol.~38, no.~3, pp. 51--62, 2008.
 
 \bibitem{Gnuplot}
 \BIBentryALTinterwordspacing
@@ -79,6 +139,11 @@ Y.~Zhu, H.~Eran, D.~Firestone, C.~Guo, M.~Lipshteyn, Y.~Liron, J.~Padhye,
 ``Mellanox dcqcn parameters.'' [Online]. Available:
   \url{https://community.mellanox.com/docs/DOC-2790}
 \BIBentrySTDinterwordspacing
+
+\bibitem{CLOS}
+M.~Al-Fares, A.~Loukissas, and A.~Vahdat, ``A scalable, commodity data center
+  network architecture,'' \emph{Acm Sigcomm Computer Communication Review},
+  vol.~38, no.~4, pp. 63--74, 2008.
 
 \bibitem{credit}
 D.~Han, ``Credit-scheduled delay-bounded congestion control for datacenters,''
